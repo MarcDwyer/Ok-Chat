@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import { getTwitchUrl } from './util';
@@ -27,9 +27,13 @@ const createWindow = async () => {
         height: 720,
         webPreferences: {
             nodeIntegration: true
-        }
+        },
+        title: 'Twitch-IRC'
     });
-
+    win.on('page-title-updated', function(e) {
+        e.preventDefault();
+    });
+    win.setTitle('Twitch-IRC');
     if (process.env.NODE_ENV !== 'production') {
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'; // eslint-disable-line require-atomic-updates
         win.loadURL(`http://localhost:2003`);

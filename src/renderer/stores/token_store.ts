@@ -1,4 +1,4 @@
-import { makeAutoObservable, action } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 
 export class TokenStore {
     token: string | null = null;

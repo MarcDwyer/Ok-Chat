@@ -1,10 +1,14 @@
 import * as React from 'react';
-import { ipcRenderer } from 'electron';
+import { FaTwitch } from 'react-icons/fa';
+
+import LoginBtn from '../LoginBtn/login_btn';
+
+import './login.scss';
 
 export default function Login() {
     return (
         <div className="login-container">
-            <button onClick={() => ipcRenderer.send('get-auth')}>Authorize</button>
+            <LoginBtn backgroundColor="#6441a5" Icon={FaTwitch} />
         </div>
     );
 }

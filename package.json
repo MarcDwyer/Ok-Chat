@@ -1,5 +1,5 @@
 {
-    "name": "electron-react-typescript",
+    "name": "Twitch-IRC",
     "version": "0.0.7",
     "description": "",
     "main": "./dist/main.js",
@@ -136,6 +136,7 @@
         "mobx": "^6.0.4",
         "mobx-react-lite": "^3.1.6",
         "react": "^16.14.0",
-        "react-dom": "^16.14.0"
+        "react-dom": "^16.14.0",
+        "react-icons": "^4.1.0"
     }
 }
