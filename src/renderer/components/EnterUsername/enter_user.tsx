@@ -1,23 +1,23 @@
-import * as React from 'react';
-import { TwitchChat } from '../../stores/tc_store';
+import React, { useEffect } from 'react';
 import { ThemeStore } from '../../stores/theme_store';
+import { UserInfoStore } from '../../stores/user_info_store';
 
 import './enter_user.scss';
 
 type Props = {
     theme: ThemeStore;
-    tc: TwitchChat;
+    userInfo: UserInfoStore;
 };
 
 export const EnterUser = (p: Props) => {
     const [username, setUser] = React.useState<string>('');
     console.log(username);
-    React.useEffect(() => {
+    useEffect(() => {
         return setUser('');
     }, []);
     return (
         <div className="enter-user-container">
-            <form onSubmit={() => (p.tc.username = username)}>
+            <form onSubmit={() => p.userInfo.setUsername(username)}>
                 <span>Enter your username</span>
                 <input
                     className="enter-input"

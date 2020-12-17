@@ -1,24 +1,20 @@
 import { makeAutoObservable } from 'mobx';
 import { Commands, SecureIrcUrl } from '../twitch_types/twitch_types';
 import { msgParcer } from '../parser';
+import { UserInfo } from './user_info_store';
 
-export class TwitchChat {
+export class TwitchStore {
     ws: WebSocket | null = null;
 
-    token: string | null = null;
-    username: string | null = null;
+    info: UserInfo | null = null;
+
+    error: string | null = null;
 
     constructor() {
-        this.token = localStorage.getItem('token');
         makeAutoObservable(this);
     }
-    setToken(token: string) {
-        localStorage.setItem('token', token);
-        this.token = token;
-    }
-    initWs() {
-        if (!this.token || !this.username) return;
-        const { token, username } = this;
+
+    initWs({ username, token }: UserInfo) {
         const ws = new WebSocket(SecureIrcUrl);
         ws.onopen = () => {
             ws.send(`PASS oauth:${token}`);
@@ -40,11 +36,17 @@ export class TwitchChat {
                 case Commands.NOTICE:
                     if (tmsg.raw.includes('failed')) {
                         console.error('failed connecting to twitch');
+                        this.error = tmsg.raw;
+                        this.ws = null;
                     }
                     break;
                 default:
                     console.log('fell through default');
             }
+        };
+
+        ws.onclose = () => {
+            this.ws = null;
         };
     }
 }

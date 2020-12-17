@@ -1,13 +1,14 @@
 import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react-lite';
-import * as React from 'react';
-import { TwitchChat } from '../../stores/tc_store';
+import React, { useEffect } from 'react';
+import { TwitchStore } from '../../stores/tc_store';
 import { ThemeStore } from '../../stores/theme_store';
 
 import Login from '../Login/login';
 import { EnterUser } from '../EnterUsername/enter_user';
 
 import './main.scss';
+import { UserInfoStore } from '../../stores/user_info_store';
 
 type TokenPayload = {
     token?: string;
@@ -15,24 +16,23 @@ type TokenPayload = {
 
 type Props = {
     themeStore: ThemeStore;
-    tc: TwitchChat;
+    tc: TwitchStore;
+    userInfo: UserInfoStore;
 };
-export const Main = observer(({ themeStore, tc }: Props) => {
+export const Main = observer(({ themeStore, tc, userInfo }: Props) => {
     const { themeData } = themeStore;
-    const { token, username } = tc;
+    const { token, username } = userInfo;
     ipcRenderer.on('get-auth', (msg: any) => {
         console.log(msg);
     });
     ipcRenderer.on('token', (evt, arg: TokenPayload) => {
         if (arg.token) {
-            tc.setToken(arg.token);
+            userInfo.setToken(arg.token);
         }
     });
-    React.useEffect(() => {
-        console.log({ username, token });
+    useEffect(() => {
         if (username && token) {
-            console.log('intializing...');
-            tc.initWs();
+            tc.initWs({ username, token });
         }
     }, [username, token]);
     return (
@@ -41,12 +41,7 @@ export const Main = observer(({ themeStore, tc }: Props) => {
             style={{ backgroundColor: themeData.backgroundColor, color: themeData.color }}
         >
             {!token && <Login />}
-            {token &&
-                !username &&
-                (() => {
-                    console.log(token);
-                    return <EnterUser theme={themeStore} tc={tc} />;
-                })()}
+            {token && !username && <EnterUser theme={themeStore} userInfo={userInfo} />}
         </div>
     );
 });

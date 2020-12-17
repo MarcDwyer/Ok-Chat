@@ -2,13 +2,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 
-import { TokenStore } from './stores/token_store';
-
 import { Main } from './components/MainApp/main';
 import { ThemeStore } from './stores/theme_store';
 
 import './app.scss';
-import { TwitchChat } from './stores/tc_store';
+import { TwitchStore } from './stores/tc_store';
+import { UserInfoStore } from './stores/user_info_store';
 
 // Create main element
 const mainElement = document.createElement('div');
@@ -16,7 +15,8 @@ document.body.appendChild(mainElement);
 
 // Render components
 const themeStore = new ThemeStore();
-const tc = new TwitchChat();
+const tc = new TwitchStore();
+const userInfo = new UserInfoStore();
 
 const render = (Component: () => JSX.Element) => {
     ReactDOM.render(
@@ -27,4 +27,4 @@ const render = (Component: () => JSX.Element) => {
     );
 };
 
-render(() => <Main themeStore={themeStore} tc={tc} />);
+render(() => <Main themeStore={themeStore} tc={tc} userInfo={userInfo} />);
