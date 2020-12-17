@@ -1,8 +1,10 @@
 import { observer } from 'mobx-react-lite';
-import styled from 'styled-components';
 import React from 'react';
 import { StreamStore } from '../../stores/streams_store';
 import { ThemeStore } from '../../stores/theme_store';
+import { FaDotCircle } from 'react-icons/fa';
+
+import { StreamCard } from './follower_sc';
 
 import './followers.scss';
 
@@ -12,48 +14,23 @@ type Props = {
 };
 
 export const Followers = observer(({ streamStore, themeStore }: Props) => {
-    console.log(streamStore.streams);
+    console.log(streamStore.followers);
     const { themeData } = themeStore;
 
-    const StreamCard = styled.div`
-        display: flex;
-        padding: 5px 5px;
-        cursor: pointer;
-
-        &:hover {
-            background-color: ${themeData.backgroundColor};
-        }
-
-        img {
-            margin-right: 10px;
-            border-radius: 50%;
-            height: 35px;
-            width: 35px;
-        }
-
-        .details {
-            display: flex;
-            flex-direction: column;
-
-            .name {
-                font-size: 18px;
-                font-weight: bold;
-                color: #eee;
-            }
-            .playing {
-                font-size: 14px;
-            }
-        }
-    `;
     return (
         <div className="vertical-list" style={{ backgroundColor: themeData.shadeOne }}>
-            {streamStore.streams.map((stream, i) => {
+            <span className="header">FOLLOWED CHANNELS</span>
+            {streamStore.followers.map((follower, i) => {
                 return (
-                    <StreamCard key={i}>
-                        <img src={stream.channel.logo} alt="streamer" />
+                    <StreamCard key={i} hoverShade={themeData.shadeTwo}>
+                        <img src={follower.channel.logo} alt="streamer" />
                         <div className="details">
-                            <span className="name">{stream.channel.display_name}</span>
-                            <span className="playing">{stream.game}</span>
+                            <span className="name">{follower.channel.display_name}</span>
+                            <span className="playing">{follower.game}</span>
+                        </div>
+                        <div className="viewer-count">
+                            <FaDotCircle />
+                            <span className="viewers">{follower.viewers}</span>
                         </div>
                     </StreamCard>
                 );

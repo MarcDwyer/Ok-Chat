@@ -4,10 +4,11 @@ import { UserInfo } from './user_info_store';
 
 export class StreamStore {
     info: UserInfo | null = null;
-    streams: StreamData[] = [];
+    followers: StreamData[] = [];
 
-    private interval: NodeJS.Timeout | null = null;
+    private attempts: number = 0;
     private clientId: string = 'asgecphfrtm5zx5gdykx22ogwtpvu5';
+    private refresh: number | null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -15,18 +16,20 @@ export class StreamStore {
     async getFollowers(info: UserInfo) {
         this.info = info;
         try {
+            console.log('getting followers');
             const follows = await this.fetchV5TwitchData<V5StreamersPayload>(
                 `https://api.twitch.tv/kraken/streams/followed`
             );
             if (follows && follows.streams) {
-                this.streams = [...follows.streams, ...this.streams];
+                this.followers = follows.streams;
             }
-            if (this.interval) {
-                clearInterval(this.interval);
-                this.interval = null;
-            }
+            this.refresh = setInterval(() => this.getFollowers(info), 60000 * 5);
+            this.attempts = 0;
         } catch (e) {
-            if (!this.interval) this.interval = setInterval(() => this.getFollowers(info), 5000);
+            if (this.attempts <= 3) {
+                setTimeout(() => this.getFollowers(info), 3500);
+            }
+            ++this.attempts;
         }
     }
 
