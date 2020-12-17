@@ -1,0 +1,32 @@
+.vertical-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 225px;
+
+    .streamer-card {
+        display: flex;
+        padding: 5px 5px;
+        cursor: pointer;
+
+        img {
+            border-radius: 50%;
+            height: 35px;
+            width: 35px;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+
+            .name {
+                font-size: 18px;
+                font-weight: bold;
+                color: #eee;
+            }
+            .playing {
+                font-size: 14px;
+            }
+        }
+    }
+}
