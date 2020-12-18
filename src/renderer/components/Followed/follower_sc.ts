@@ -25,7 +25,7 @@ export const StreamCard = styled.div<SCProps>`
         flex-direction: column;
 
         .name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #eee;
         }

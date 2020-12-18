@@ -8,6 +8,7 @@ import { UserInfo, UserInfoStore } from '../../stores/user_info_store';
 import Login from '../Login/login';
 import { EnterUser } from '../EnterUsername/enter_user';
 import { Followers } from '../Followed/followers';
+import { ChannelTabs } from '../ChannelTabs/channel_tabs';
 
 import './main.scss';
 import { StreamStore } from '../../stores/streams_store';
@@ -37,7 +38,7 @@ export const Main = observer(({ themeStore, tc, userInfo, streamStore }: Props) 
         if (username && token) {
             const info: UserInfo = { username, token };
             // tc.initWs(info);
-            streamStore.getFollowers(info);
+            streamStore.init(info);
         }
     }, [username, token]);
     useEffect(() => {
@@ -56,7 +57,10 @@ export const Main = observer(({ themeStore, tc, userInfo, streamStore }: Props) 
             {token && !username && <EnterUser theme={themeStore} userInfo={userInfo} />}
             {token && username && (
                 <div className="main-app">
-                    <Followers streamStore={streamStore} themeStore={themeStore} />
+                    <Followers streamStore={streamStore} themeStore={themeStore} tc={tc} />
+                    <div className="inner-app">
+                        <ChannelTabs tc={tc} />
+                    </div>
                 </div>
             )}
         </div>

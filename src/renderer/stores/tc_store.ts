@@ -3,6 +3,8 @@ import { Commands, SecureIrcUrl } from '../twitch_types/twitch_types';
 import { msgParcer } from '../parser';
 import { UserInfo } from './user_info_store';
 
+type ChannelHub = Record<string, any>;
+
 export class TwitchStore {
     ws: WebSocket | null = null;
 
@@ -10,10 +12,18 @@ export class TwitchStore {
 
     error: string | null = null;
 
+    channels: string[] = [];
+    channelHub: ChannelHub = {};
+
     constructor() {
         makeAutoObservable(this);
     }
+    joinChannel(channel: string) {
+        const { channelHub } = this;
 
+        if (!(channel in channelHub)) {
+        }
+    }
     initWs({ username, token }: UserInfo) {
         const ws = new WebSocket(SecureIrcUrl);
         ws.onopen = () => {

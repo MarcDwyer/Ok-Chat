@@ -4,7 +4,8 @@ import { UserInfo } from './user_info_store';
 
 export class StreamStore {
     info: UserInfo | null = null;
-    followers: StreamData[] = [];
+    followers: StreamData[] | null = null;
+    error: string | null = null;
 
     private attempts: number = 0;
     private clientId: string = 'asgecphfrtm5zx5gdykx22ogwtpvu5';
@@ -13,8 +14,7 @@ export class StreamStore {
     constructor() {
         makeAutoObservable(this);
     }
-    async getFollowers(info: UserInfo) {
-        this.info = info;
+    async getFollowers() {
         try {
             console.log('getting followers');
             const follows = await this.fetchV5TwitchData<V5StreamersPayload>(
@@ -23,16 +23,24 @@ export class StreamStore {
             if (follows && follows.streams) {
                 this.followers = follows.streams;
             }
-            this.refresh = setInterval(() => this.getFollowers(info), 60000 * 5);
             this.attempts = 0;
         } catch (e) {
+            console.error(e);
             if (this.attempts <= 3) {
-                setTimeout(() => this.getFollowers(info), 3500);
+                setTimeout(() => this.getFollowers(), 3500);
+            } else {
+                this.error = "Couldn't fetch follower data";
             }
             ++this.attempts;
         }
     }
-
+    init(info: UserInfo) {
+        this.info = info;
+        this.getFollowers();
+        this.refresh = setInterval(() => {
+            this.getFollowers();
+        }, 60000 * 5);
+    }
     private async fetchV5TwitchData<T>(url: string): Promise<T | null> {
         if (!this.info) return null;
         const { token } = this.info;
