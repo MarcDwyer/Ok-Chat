@@ -25,7 +25,6 @@ export const Followers = observer(({ streamStore, themeStore, tc }: Props) => {
                 followers.map((follower, i) => {
                     const limit = 15;
                     let name = follower.channel.display_name;
-                    const key = name.toLowerCase();
                     if (name.length > limit) {
                         name = name.substr(0, limit) + '...';
                     }
@@ -33,7 +32,7 @@ export const Followers = observer(({ streamStore, themeStore, tc }: Props) => {
                         <StreamCard
                             key={i}
                             hoverShade={themeData.shadeTwo}
-                            onClick={_ => tc.joinChannel(key)}
+                            onClick={_ => tc.joinChannel(follower.channel.display_name)}
                         >
                             <img src={follower.channel.logo} alt="streamer" />
                             <div className="details">

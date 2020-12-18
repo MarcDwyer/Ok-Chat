@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import { Commands, SecureIrcUrl } from '../twitch_types/twitch_types';
 import { msgParcer } from '../parser';
 import { UserInfo } from './user_info_store';
+import { Channel } from './channel';
 
 type ChannelHub = Record<string, any>;
 
@@ -16,20 +17,55 @@ export class TwitchStore {
     channelHub: ChannelHub = {};
 
     constructor() {
+        const channels = localStorage.getItem('channels');
+        if (channels) {
+            this.channels = JSON.parse(channels);
+        }
         makeAutoObservable(this);
     }
     joinChannel(channel: string) {
         const { channelHub } = this;
-
-        if (!(channel in channelHub)) {
+        channel = channel.toLowerCase();
+        if (!(channel in channelHub) && this.ws) {
+            const chan = new Channel(channel, this.ws);
+            this.channelHub[chan.key] = chan;
+            const pos = this.channels.push(chan.key);
+            chan.join(pos);
+            this.setChannelsLS();
         }
     }
-    initWs({ username, token }: UserInfo) {
+    partChannel(channel: string) {
+        const chan = this.channelHub[channel] as Channel | undefined;
+        if (chan) {
+            chan.part();
+            this.channels.splice(chan.position, 1);
+            this.setChannelsLS();
+            delete this.channelHub[channel];
+        }
+    }
+    setChannelsLS() {
+        localStorage.setItem('channels', JSON.stringify(this.channels));
+    }
+    joinedSaved() {
+        if (this.channels.length && this.ws) {
+            this.channels.forEach((channel, i) => {
+                const chan = new Channel(channel, this.ws as WebSocket);
+                chan.join(i);
+                this.channelHub[channel] = chan;
+            });
+        }
+    }
+    init(info: UserInfo) {
+        this.info = info;
+        this.connect();
+    }
+    connect() {
+        if (!this.info) throw new Error('Did not receive users info');
+        const { token, username } = this.info;
         const ws = new WebSocket(SecureIrcUrl);
         ws.onopen = () => {
             ws.send(`PASS oauth:${token}`);
             ws.send(`NICK ${username}`);
-            this.ws = ws;
         };
 
         ws.onmessage = msg => {
@@ -42,6 +78,7 @@ export class TwitchStore {
                     break;
                 case '001':
                     this.ws = ws;
+                    this.joinedSaved();
                     break;
                 case Commands.NOTICE:
                     if (tmsg.raw.includes('failed')) {
