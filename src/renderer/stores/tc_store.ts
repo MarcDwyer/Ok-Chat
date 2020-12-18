@@ -4,7 +4,7 @@ import { msgParcer } from '../parser';
 import { UserInfo } from './user_info_store';
 import { Channel } from './channel';
 
-type ChannelHub = Record<string, any>;
+type ChannelHub = Record<string, Channel>;
 
 export class TwitchStore {
     ws: WebSocket | null = null;
@@ -25,7 +25,7 @@ export class TwitchStore {
     }
     joinChannel(channel: string) {
         const { channelHub } = this;
-        channel = channel.toLowerCase();
+        channel = '#' + channel.toLowerCase();
         if (!(channel in channelHub) && this.ws) {
             const chan = new Channel(channel, this.ws);
             this.channelHub[chan.key] = chan;
@@ -49,6 +49,7 @@ export class TwitchStore {
     joinedSaved() {
         if (this.channels.length && this.ws) {
             this.channels.forEach((channel, i) => {
+                console.log(`Joining ${channel}`);
                 const chan = new Channel(channel, this.ws as WebSocket);
                 chan.join(i);
                 this.channelHub[channel] = chan;
@@ -70,8 +71,8 @@ export class TwitchStore {
 
         ws.onmessage = msg => {
             const tmsg = msgParcer(msg.data, username);
+            console.log(tmsg?.channel);
             if (!tmsg) return;
-            console.log(tmsg);
             switch (tmsg?.command) {
                 case Commands.PING:
                     ws.send('PONG :tmi.twitch.tv');
@@ -88,7 +89,10 @@ export class TwitchStore {
                     }
                     break;
                 default:
-                    console.log('fell through default');
+                    const channel = this.channelHub[tmsg.channel] as Channel | undefined;
+                    if (channel) {
+                        channel.handleMsg(tmsg);
+                    }
             }
         };
 
