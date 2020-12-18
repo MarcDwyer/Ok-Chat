@@ -15,6 +15,7 @@ export class TwitchStore {
 
     channels: string[] = [];
     channelHub: ChannelHub = {};
+    selected: string | null = null;
 
     constructor() {
         const channels = localStorage.getItem('channels');

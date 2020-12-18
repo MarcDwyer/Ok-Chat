@@ -18,10 +18,6 @@ let win: BrowserWindow | null;
 // };
 
 const createWindow = async () => {
-    // if (process.env.NODE_ENV !== 'production') {
-    //     await installExtensions();
-    // }
-
     win = new BrowserWindow({
         width: 1280,
         height: 720,
@@ -30,9 +26,13 @@ const createWindow = async () => {
         },
         title: 'Twitch-IRC'
     });
+    if (process.env.NODE_ENV !== 'production' && win) {
+        win.webContents.session.clearStorageData();
+    }
     win.on('page-title-updated', function(e) {
         e.preventDefault();
     });
+
     win.setTitle('Twitch-IRC');
     if (process.env.NODE_ENV !== 'production') {
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'; // eslint-disable-line require-atomic-updates
@@ -81,11 +81,7 @@ function handleAuthApp(url: string, signal: Deferred<string>) {
     url = url.replace('#', '?');
     const u = new URL(url);
     const accessToken = u.searchParams.get('access_token');
-    if (!accessToken) {
-        signal.reject('No access token found');
-        return;
-    }
-    signal.resolve(accessToken);
+    if (accessToken) signal.resolve(accessToken);
 }
 ipcMain.on('get-auth', async (event, arg: any) => {
     const signal = deferred<string>();
@@ -107,6 +103,10 @@ ipcMain.on('get-auth', async (event, arg: any) => {
     });
     authWindow.webContents.on('will-redirect', function(event, newUrl) {
         console.log(`Redirect: ${newUrl}`);
+        handleAuthApp(newUrl, signal);
+    });
+    authWindow.webContents.on('will-navigate', function(event, newUrl) {
+        console.log(`Navigate: ${newUrl}`);
         handleAuthApp(newUrl, signal);
     });
     try {

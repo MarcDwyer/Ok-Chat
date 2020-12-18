@@ -32,7 +32,12 @@ export const Followers = observer(({ streamStore, themeStore, tc }: Props) => {
                         <StreamCard
                             key={i}
                             hoverShade={themeData.shadeTwo}
-                            onClick={_ => tc.joinChannel(follower.channel.display_name)}
+                            onClick={_ => {
+                                const lc = name.toLowerCase();
+                                tc.channels.push(lc);
+                                tc.selected = lc;
+                                //tc.joinChannel(follower.channel.display_name)
+                            }}
                         >
                             <img src={follower.channel.logo} alt="streamer" />
                             <div className="details">

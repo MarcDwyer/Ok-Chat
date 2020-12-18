@@ -7,7 +7,9 @@ export const StreamCard = styled.div<SCProps>`
     display: flex;
     padding: 5px 5px;
     cursor: pointer;
-    width: 255px;
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
 
     &:hover {
         background-color: ${p => p.hoverShade};

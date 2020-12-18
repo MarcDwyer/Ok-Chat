@@ -37,7 +37,7 @@ export const Main = observer(({ themeStore, tc, userInfo, streamStore }: Props) 
     useEffect(() => {
         if (username && token) {
             const info: UserInfo = { username, token };
-            tc.init(info);
+            // tc.init(info);
             streamStore.init(info);
         }
     }, [username, token]);
@@ -59,7 +59,7 @@ export const Main = observer(({ themeStore, tc, userInfo, streamStore }: Props) 
                 <div className="main-app">
                     <Followers streamStore={streamStore} themeStore={themeStore} tc={tc} />
                     <div className="inner-app">
-                        <ChannelTabs tc={tc} />
+                        <ChannelTabs tc={tc} theme={themeData} />
                     </div>
                 </div>
             )}

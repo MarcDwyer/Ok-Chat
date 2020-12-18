@@ -3,3 +3,18 @@ html {
     padding: 0;
     margin: 0;
 }
+
+.main-tab::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.55em;
+}
+
+.main-tab::-webkit-scrollbar-track {
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.main-tab::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+}
