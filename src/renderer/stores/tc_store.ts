@@ -4,7 +4,7 @@ import { msgParcer } from '../parser';
 import { UserInfo } from './user_info_store';
 import { Channel } from './channel';
 
-type ChannelHub = Record<string, Channel>;
+type ChannelHub = Map<string, Channel>;
 
 export class TwitchStore {
     ws: WebSocket | null = null;
@@ -13,48 +13,49 @@ export class TwitchStore {
 
     error: string | null = null;
 
-    channels: string[] = [];
-    channelHub: ChannelHub = {};
+    channelHub: ChannelHub = new Map();
     selected: string | null = null;
 
     constructor() {
-        const channels = localStorage.getItem('channels');
-        if (channels) {
-            this.channels = JSON.parse(channels);
-        }
         makeAutoObservable(this);
     }
+
     joinChannel(channel: string) {
         const { channelHub } = this;
         channel = '#' + channel.toLowerCase();
-        if (!(channel in channelHub) && this.ws) {
+        if (!channelHub.has(channel) && this.ws) {
             const chan = new Channel(channel, this.ws);
-            this.channelHub[chan.key] = chan;
-            const pos = this.channels.push(chan.key);
-            chan.join(pos);
+            this.channelHub.set(channel, chan);
             this.setChannelsLS();
         }
+        this.selected = channel;
     }
     partChannel(channel: string) {
-        const chan = this.channelHub[channel] as Channel | undefined;
+        const chan = this.channelHub.get(channel);
         if (chan) {
             chan.part();
-            this.channels.splice(chan.position, 1);
+            this.channelHub.delete(channel);
             this.setChannelsLS();
-            delete this.channelHub[channel];
         }
     }
     setChannelsLS() {
-        localStorage.setItem('channels', JSON.stringify(this.channels));
+        const session: string[] = [];
+
+        for (const key of this.channelHub.keys()) {
+            session.push(key);
+        }
+
+        localStorage.setItem('channels', JSON.stringify(session));
     }
     joinedSaved() {
-        if (this.channels.length && this.ws) {
-            this.channels.forEach((channel, i) => {
-                console.log(`Joining ${channel}`);
-                const chan = new Channel(channel, this.ws as WebSocket);
-                chan.join(i);
-                this.channelHub[channel] = chan;
-            });
+        const s = localStorage.getItem('channels');
+        if (!s || !this.ws) return;
+        const channels = JSON.parse(s) as string[];
+        for (const channel of channels) {
+            if (this.channelHub.has(channel)) continue;
+            const c = new Channel(channel, this.ws);
+            c.join();
+            this.channelHub.set(channel, c);
         }
     }
     init(info: UserInfo) {
@@ -72,7 +73,7 @@ export class TwitchStore {
 
         ws.onmessage = msg => {
             const tmsg = msgParcer(msg.data, username);
-            console.log(tmsg?.channel);
+            console.log(tmsg);
             if (!tmsg) return;
             switch (tmsg?.command) {
                 case Commands.PING:
@@ -81,6 +82,7 @@ export class TwitchStore {
                 case '001':
                     this.ws = ws;
                     this.joinedSaved();
+                    console.log('connected');
                     break;
                 case Commands.NOTICE:
                     if (tmsg.raw.includes('failed')) {
@@ -90,7 +92,8 @@ export class TwitchStore {
                     }
                     break;
                 default:
-                    const channel = this.channelHub[tmsg.channel] as Channel | undefined;
+                    const channel = this.channelHub.get(tmsg.channel);
+                    console.log({ channel, tmsg });
                     if (channel) {
                         channel.handleMsg(tmsg);
                     }

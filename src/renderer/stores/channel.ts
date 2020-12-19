@@ -10,21 +10,21 @@ export class Channel {
     messages: Message[] = [];
     joined: boolean = false;
 
-    position: number = 0;
-
     constructor(public key: string, private ws: WebSocket) {}
 
-    join(pos: number) {
-        this.ws.send(`JOIN ${this.key}`);
-        this.position = pos;
+    join() {
+        const joinMsg = `JOIN ${this.key}`;
+        console.log(joinMsg);
+        this.ws.send(joinMsg);
         this.joined = true;
     }
     part() {
         this.ws.send(`PART ${this.key}`);
         this.joined = false;
     }
-    msg(msg: string) {
-        console.log(`Channel: ${this.key}. Msg: ${msg}`);
+
+    send(msg: string) {
+        this.ws.send(`PRIVMSG ${this.key} :${msg}`);
     }
     handleMsg(irc: IrcMessage) {
         switch (irc.command) {

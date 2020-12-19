@@ -1,12 +1,17 @@
 .login-btn {
     display: flex;
-    padding: 15px 15px;
+    padding: 10px 10px;
     color: #eee;
-    font-size: 22px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 22px;
 
-    svg {
+    .icon {
+        height: 100%;
         margin-left: 10px;
+        border-left: 1px solid #eee;
+        svg {
+            margin-left: 10px;
+        }
     }
 }

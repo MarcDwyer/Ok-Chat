@@ -1,0 +1,19 @@
+.main-chat {
+    width: 99%;
+    margin: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .selected {
+        width: 100%;
+        height: 100%;
+        border: solid 1px red;
+
+        .chat {
+            width: 100%;
+            border: solid 1px blue;
+            height: 100%;
+        }
+    }
+}

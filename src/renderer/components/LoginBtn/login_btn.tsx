@@ -16,7 +16,9 @@ export default function LoginBtn(p: Props) {
             style={{ backgroundColor: p.backgroundColor }}
         >
             <span>Continue with</span>
-            <p.Icon />
+            <div className="icon">
+                <p.Icon />
+            </div>
         </div>
     );
 }

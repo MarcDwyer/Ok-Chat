@@ -1,0 +1,13 @@
+.chat-box {
+    border-radius: 10px;
+    height: 95px;
+    width: 65%;
+    margin: auto auto 10px auto;
+
+    form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        margin: auto;
+    }
+}
