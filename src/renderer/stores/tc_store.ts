@@ -1,12 +1,20 @@
 import { makeAutoObservable } from 'mobx';
-import { Commands, SecureIrcUrl } from '../twitch_types/twitch_types';
-import { msgParcer } from '../parser';
 import { UserInfo } from './user_info_store';
 import { Channel } from './channel';
+import { ChatUserstate, Client } from 'tmi.js';
+
+import { delay } from '../util';
 
 type ChannelHub = Map<string, Channel>;
 
+export type Message = {
+    userData: ChatUserstate;
+    message: string;
+    directMsg: boolean;
+};
+
 export class TwitchStore {
+    client: Client | null = null;
     ws: WebSocket | null = null;
 
     info: UserInfo | null = null;
@@ -23,8 +31,9 @@ export class TwitchStore {
     joinChannel(channel: string) {
         const { channelHub } = this;
         channel = '#' + channel.toLowerCase();
-        if (!channelHub.has(channel) && this.ws) {
-            const chan = new Channel(channel, this.ws);
+        if (!channelHub.has(channel) && this.client) {
+            const chan = new Channel(channel, this.client);
+            chan.join();
             this.channelHub.set(channel, chan);
             this.setChannelsLS();
         }
@@ -47,15 +56,24 @@ export class TwitchStore {
 
         localStorage.setItem('channels', JSON.stringify(session));
     }
-    joinedSaved() {
+    async joinedSaved() {
         const s = localStorage.getItem('channels');
-        if (!s || !this.ws) return;
+        if (!s || !this.client) return;
         const channels = JSON.parse(s) as string[];
         for (const channel of channels) {
-            if (this.channelHub.has(channel)) continue;
-            const c = new Channel(channel, this.ws);
-            c.join();
-            this.channelHub.set(channel, c);
+            try {
+                let c = this.channelHub.get(channel);
+                if (c && !c.joined) {
+                    await c.join();
+                    return;
+                }
+                c = new Channel(channel, this.client);
+                await c.join();
+                this.channelHub.set(channel, c);
+            } catch (_) {
+            } finally {
+                await delay(450);
+            }
         }
     }
     init(info: UserInfo) {
@@ -65,43 +83,29 @@ export class TwitchStore {
     connect() {
         if (!this.info) throw new Error('Did not receive users info');
         const { token, username } = this.info;
-        const ws = new WebSocket(SecureIrcUrl);
-        ws.onopen = () => {
-            ws.send(`PASS oauth:${token}`);
-            ws.send(`NICK ${username}`);
-        };
-
-        ws.onmessage = msg => {
-            const tmsg = msgParcer(msg.data, username);
-            console.log(tmsg);
-            if (!tmsg) return;
-            switch (tmsg?.command) {
-                case Commands.PING:
-                    ws.send('PONG :tmi.twitch.tv');
-                    break;
-                case '001':
-                    this.ws = ws;
-                    this.joinedSaved();
-                    console.log('connected');
-                    break;
-                case Commands.NOTICE:
-                    if (tmsg.raw.includes('failed')) {
-                        console.error('failed connecting to twitch');
-                        this.error = tmsg.raw;
-                        this.ws = null;
-                    }
-                    break;
-                default:
-                    const channel = this.channelHub.get(tmsg.channel);
-                    console.log({ channel, tmsg });
-                    if (channel) {
-                        channel.handleMsg(tmsg);
-                    }
+        const client = Client({
+            connection: {
+                reconnect: true,
+                secure: true
+            },
+            identity: {
+                username,
+                password: `oauth:${token}`
             }
-        };
-
-        ws.onclose = () => {
-            this.ws = null;
-        };
+        });
+        client.connect();
+        client.on('logon', () => {
+            console.log('logged');
+            this.client = client;
+            this.joinedSaved();
+        });
+        client.on('message', (channel, tags, message, self) => {
+            console.log(channel);
+            const c = this.channelHub.get(channel);
+            if (c) {
+                const m: Message = { userData: tags, message, directMsg: self };
+                c.handleMsg(m);
+            }
+        });
     }
 }

@@ -1,19 +1,19 @@
-.main-chat {
-    width: 99%;
-    margin: auto;
+.selected {
+    width: 100%;
     height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-
-    .selected {
+    margin: 5px;
+    .chat {
+        display: flex;
+        flex-direction: column-reverse;
         width: 100%;
         height: 100%;
-        border: solid 1px red;
-
-        .chat {
-            width: 100%;
-            border: solid 1px blue;
-            height: 100%;
+        overflow-y: auto;
+        .message {
+            display: flex;
         }
     }
 }

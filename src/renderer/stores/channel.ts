@@ -1,43 +1,35 @@
-import { Commands, IrcMessage } from '../twitch_types/twitch_types';
-
-export type Message = {
-    author: string;
-    message: string;
-    directMsg: boolean;
-};
+import { makeAutoObservable } from 'mobx';
+import { Client } from 'tmi.js';
+import { Message } from './tc_store';
 
 export class Channel {
     messages: Message[] = [];
     joined: boolean = false;
+    error: string | null = null;
+    constructor(public key: string, private client: Client) {
+        makeAutoObservable(this);
+    }
 
-    constructor(public key: string, private ws: WebSocket) {}
-
-    join() {
-        const joinMsg = `JOIN ${this.key}`;
-        console.log(joinMsg);
-        this.ws.send(joinMsg);
-        this.joined = true;
+    async join() {
+        console.log(`Joining ${this.key}`);
+        try {
+            await this.client.join(this.key);
+            this.error = null;
+            this.joined = true;
+        } catch (e) {
+            this.error = e;
+            this.joined = false;
+        }
     }
     part() {
-        this.ws.send(`PART ${this.key}`);
+        this.client.part(this.key).then(() => (this.joined = false));
         this.joined = false;
     }
 
     send(msg: string) {
-        this.ws.send(`PRIVMSG ${this.key} :${msg}`);
+        this.client.say(this.key, msg);
     }
-    handleMsg(irc: IrcMessage) {
-        switch (irc.command) {
-            case Commands.PRIVMSG:
-                const msg: Message = {
-                    author: irc.username,
-                    message: irc.message,
-                    directMsg: irc.directMsg
-                };
-                this.messages.push(msg);
-                break;
-            default:
-                console.log(`${this.key}: ${irc.command}`);
-        }
+    handleMsg(m: Message) {
+        this.messages = [m, ...this.messages];
     }
 }

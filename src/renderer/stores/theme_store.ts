@@ -11,6 +11,6 @@ export class ThemeStore {
         color: 'rgb(180, 186, 194)',
         border: 'rgb(61, 85, 209)',
         shadeOne: 'rgb(35, 38, 43)',
-        shadeTwo: '#383B40'
+        shadeTwo: '#5F6266'
     };
 }

@@ -12,34 +12,40 @@ export const Chat = observer(({ tc }: Props) => {
     const { selected } = tc;
 
     const channel = selected ? tc.channelHub.get(selected) : null;
-    console.log({ selected, channel });
     return (
-        <div className="main-chat">
+        <>
             {!selected && <div>Try joining a channel...</div>}
             {selected &&
                 channel &&
                 (() => {
-                    console.log(channel);
+                    const isError = Boolean(channel.error);
                     return (
                         <div className="selected">
                             <div className="chat">
-                                {channel.messages.map(msg => {
+                                {isError && <span className="chan error">{channel.error}</span>}
+                                {channel.messages.map((msg, i) => {
                                     return (
                                         <div
                                             className={`message ${
                                                 msg.directMsg ? 'directmsg' : ''
                                             }`}
+                                            key={i}
                                         >
-                                            <span className="author">{msg.author}</span>
+                                            <span
+                                                style={{ color: msg.userData.color }}
+                                                className="author"
+                                            >
+                                                {msg.userData.username}
+                                            </span>
                                             <span className="actual-msg">{msg.message}</span>
                                         </div>
                                     );
                                 })}
                             </div>
+                            <ChatBox channel={channel} />
                         </div>
                     );
                 })()}
-            <ChatBox channel={channel} />
-        </div>
+        </>
     );
 });

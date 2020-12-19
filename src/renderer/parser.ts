@@ -1,3 +1,4 @@
+import { FaCreativeCommonsSamplingPlus } from 'react-icons/fa';
 import { IrcMessage, Commands } from './twitch_types/twitch_types';
 import { removeBreaks } from './util';
 
@@ -52,7 +53,6 @@ export function msgParcer(data: string, username: string) {
         message: '',
         username: ''
     };
-
     // Position and nextspace are used by the parser as a reference..
     var position = 0;
     var nextspace = 0;
@@ -69,11 +69,13 @@ export function msgParcer(data: string, username: string) {
 
         // Tags are split by a semi colon..
         var rawTags = data.slice(1, nextspace).split(';');
+        console.log(rawTags);
         for (var i = 0; i < rawTags.length; i++) {
             // Tags delimited by an equals sign are key=value tags.
             // If there's no equals, we assign the tag a value of true.
             var tag = rawTags[i];
             const [k, v] = tag.split('=');
+            console.log({ k, v });
             message.tags.set(k, v);
         }
 
