@@ -26,14 +26,16 @@ const createWindow = async () => {
         },
         title: 'Twitch-IRC'
     });
-    // if (process.env.NODE_ENV !== 'production' && win) {
-    //     win.webContents.session.clearStorageData();
-    // }
+    if (process.env.NODE_ENV !== 'production' && win) {
+        win.webContents.session.clearStorageData();
+    }
     win.on('page-title-updated', function(e) {
         e.preventDefault();
     });
 
     win.setTitle('Twitch-IRC');
+
+    win.webContents.session.flushStorageData();
     if (process.env.NODE_ENV !== 'production') {
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'; // eslint-disable-line require-atomic-updates
         win.loadURL(`http://localhost:2003`);

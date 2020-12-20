@@ -100,7 +100,8 @@ export class TwitchStore {
         client.on('message', (channel, tags, message, self) => {
             const c = this.channelHub.get(channel);
             if (c) {
-                const m: Message = { userData: tags, message, self };
+                const isDirect = message.toLowerCase().includes(username);
+                const m: Message = { userData: tags, message, self, isDirect };
                 c.handleMsg(m);
             }
         });
