@@ -21,7 +21,7 @@ export class TwitchStore {
 
     tabs: string[] = [];
     channelHub: ChannelHub = new Map();
-    selected: Channel | undefined = undefined;
+    selected: Channel | undefined;
 
     constructor() {
         const ls = localStorage.getItem('tabs');
