@@ -39,14 +39,14 @@ export const Main = observer(({ themeStore, tc, userInfo, streamStore }: Props) 
         if (username && token) {
             const info: UserInfo = { username, token };
             streamStore.init(info);
-            tc.init(info);
+            tc.connect(info);
         }
     }, [username, token]);
+
     useEffect(() => {
         return function() {
             console.log('closing...');
-            tc.ws?.close();
-            tc.ws = null;
+            tc.client?.disconnect();
         };
     }, []);
     return (
@@ -61,7 +61,7 @@ export const Main = observer(({ themeStore, tc, userInfo, streamStore }: Props) 
                     <Followers streamStore={streamStore} themeStore={themeStore} tc={tc} />
                     <div className="inner-app">
                         <ChannelTabs tc={tc} theme={themeData} />
-                        <Chat tc={tc} />
+                        <Chat selected={tc.selected} />
                     </div>
                 </div>
             )}

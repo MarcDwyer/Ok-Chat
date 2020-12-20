@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react-lite';
 import styled from 'styled-components';
 import { TwitchStore } from '../../stores/tc_store';
 import { ThemeData } from '../../stores/theme_store';
+import { AiOutlineClose } from 'react-icons/ai';
 
 import './channel_tabs.scss';
 
@@ -31,15 +32,43 @@ const Tab = styled.div<TabProps>`
     border-right: 0.5px solid black;
 
     span {
-        margin: auto auto 1.5px 1.5px;
+        margin: auto;
+    }
+    svg {
+        margin: auto;
     }
 `;
 export const ChannelTabs = observer(({ tc, theme }: Props) => {
-    const { selected } = tc;
-    const genTabs = tc.channelHub.entries();
+    const { selected, tabs } = tc;
     return (
         <div className="main-tab">
-            {(() => {
+            {tabs.length !== 0 &&
+                tabs.map((tab, i) => {
+                    let isSel = Boolean(selected && selected.key === tab);
+                    const c = tc.channelHub.get(tab);
+                    if (!c) {
+                        return null;
+                    }
+                    return (
+                        <Tab
+                            onClick={() => (tc.selected = c)}
+                            isError={Boolean(c.error)}
+                            isSel={isSel}
+                            shadeOne={theme.shadeOne}
+                            shadeTwo={theme.shadeTwo}
+                            key={i}
+                        >
+                            <span>{tab}</span>
+                            <AiOutlineClose
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    tc.partChannel(tab, i);
+                                }}
+                            />
+                        </Tab>
+                    );
+                })}
+            {/* {(() => {
                 const tabs: JSX.Element[] = [];
                 let i = 0;
                 for (const [key, chan] of genTabs) {
@@ -55,13 +84,14 @@ export const ChannelTabs = observer(({ tc, theme }: Props) => {
                             key={i}
                         >
                             <span>{key}</span>
+                            <AiOutlineClose onClick={() => tc.partChannel(key)} />
                         </Tab>
                     );
                     tabs.push(tab);
                     ++i;
                 }
                 return tabs;
-            })()}
+            })()} */}
         </div>
     );
 });

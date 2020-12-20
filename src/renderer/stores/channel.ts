@@ -2,11 +2,24 @@ import { makeAutoObservable } from 'mobx';
 import { Client } from 'tmi.js';
 import { Message } from './tc_store';
 
+type ChannelData = {
+    position: number;
+    client: Client;
+    key: string;
+};
 export class Channel {
+    client: Client;
+    key: string;
+    position: number;
+
     messages: Message[] = [];
     joined: boolean = false;
     error: string | null = null;
-    constructor(public key: string, private client: Client) {
+
+    constructor({ client, position, key }: ChannelData) {
+        this.client = client;
+        this.position = position;
+        this.key = key;
         makeAutoObservable(this);
     }
 
@@ -30,6 +43,12 @@ export class Channel {
         this.client.say(this.key, msg);
     }
     handleMsg(m: Message) {
-        this.messages = [m, ...this.messages];
+        const limit = 250;
+        let msgs = [...this.messages];
+        if (msgs.length > limit) {
+            console.log('limit hit');
+            msgs.length = limit - 25;
+        }
+        this.messages = [m, ...msgs];
     }
 }

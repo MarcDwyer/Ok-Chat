@@ -1,0 +1,2 @@
+☐ Channel tabs require ordered state, change to array of strings @started(20-12-19 19:16)
+☐ Listen to Ctrl+W events to close selected tab

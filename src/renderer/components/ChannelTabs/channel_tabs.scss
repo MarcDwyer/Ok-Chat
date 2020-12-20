@@ -1,6 +1,10 @@
 .main-tab {
     display: flex;
-    height: 40px;
-    overflow-x: overlay;
+    height: 50px;
+    overflow-x: hidden;
     overflow-y: hidden;
+
+    &:hover {
+        overflow-x: overlay;
+    }
 }
