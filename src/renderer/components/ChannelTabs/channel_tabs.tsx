@@ -44,11 +44,11 @@ export const ChannelTabs = observer(({ tc, theme }: Props) => {
         <div className="main-tab">
             {tabs.length !== 0 &&
                 tabs.map((tab, i) => {
-                    let isSel = Boolean(selected && selected.key === tab);
                     const c = tc.channelHub.get(tab);
                     if (!c) {
                         return null;
                     }
+                    const isSel = selected === c;
                     return (
                         <Tab
                             onClick={() => (tc.selected = c)}
@@ -68,30 +68,6 @@ export const ChannelTabs = observer(({ tc, theme }: Props) => {
                         </Tab>
                     );
                 })}
-            {/* {(() => {
-                const tabs: JSX.Element[] = [];
-                let i = 0;
-                for (const [key, chan] of genTabs) {
-                    let isSel = selected === key;
-
-                    const tab: JSX.Element = (
-                        <Tab
-                            onClick={() => (tc.selected = key)}
-                            isError={Boolean(chan.error)}
-                            isSel={isSel}
-                            shadeOne={theme.shadeOne}
-                            shadeTwo={theme.shadeTwo}
-                            key={i}
-                        >
-                            <span>{key}</span>
-                            <AiOutlineClose onClick={() => tc.partChannel(key)} />
-                        </Tab>
-                    );
-                    tabs.push(tab);
-                    ++i;
-                }
-                return tabs;
-            })()} */}
         </div>
     );
 });

@@ -5,3 +5,4 @@
 ☐ Impl twitch's irc events to channels
 ☐ Add ability to click on individual users to display more info
 ☐ Impl BTTVs emotes and Twitch's
+☐ Fix chat not re-rendering on undefined

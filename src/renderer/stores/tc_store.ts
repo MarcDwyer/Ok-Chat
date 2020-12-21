@@ -3,8 +3,6 @@ import { UserInfo } from './user_info_store';
 import { Channel } from './channel';
 import { ChatUserstate, Client } from 'tmi.js';
 
-import { delay } from '../util';
-
 type ChannelHub = Map<string, Channel>;
 
 export type Message = {
@@ -14,29 +12,25 @@ export type Message = {
     isDirect?: boolean;
 };
 
+type Join = () => Promise<void>;
+
 export class TwitchStore {
     client: Client | null = null;
     ws: WebSocket | null = null;
     error: string | null = null;
 
-    tabs: string[] = [];
     channelHub: ChannelHub = new Map();
-    selected: Channel | undefined;
+    selected: Channel | null = null;
 
     constructor() {
-        const ls = localStorage.getItem('tabs');
-        if (ls) {
-            this.tabs = JSON.parse(ls);
-        }
         makeAutoObservable(this);
     }
-    //Click same stream twice to test
     joinChannel(chanName: string) {
         if (!this.client) throw new Error('No client conn has been established');
         chanName = '#' + chanName.toLowerCase();
         let c = this.channelHub.get(chanName);
         if (!c) {
-            const position = this.tabs.push(chanName) - 1;
+            const position = this.channelHub.size;
             c = new Channel({ key: chanName, position, client: this.client });
             this.channelHub.set(chanName, c);
             this.setTabsLS();
@@ -50,37 +44,58 @@ export class TwitchStore {
         }
         channel.part();
         this.channelHub.delete(channel.key);
-        this.tabs.splice(channel.position, 1);
+        this.decPosition();
         this.setTabsLS();
     }
+    decPosition() {
+        for (const chan of this.channelHub.values()) {
+            if (chan.position !== 0) {
+                --chan.position;
+            }
+        }
+    }
     setNewSelected(index: number) {
-        let sel = this.tabs[index - 1] || this.tabs[index + 1];
+        const sel = this.tabs[index - 1] || this.tabs[index + 1];
         if (sel) {
             const channel = this.channelHub.get(sel);
-            this.selected = channel;
+            if (channel) this.selected = channel;
         }
     }
     setTabsLS() {
-        localStorage.setItem('tabs', JSON.stringify(this.tabs));
+        localStorage.setItem('channels', JSON.stringify(this.tabs));
+    }
+    get tabs() {
+        const result: string[] = [];
+        result.length = this.channelHub.size;
+        console.log({ result, hub: this.channelHub });
+        for (const [k, chan] of this.channelHub.entries()) {
+            console.log(k);
+            result[chan.position] = k;
+        }
+        console.log(result);
+        return result;
     }
     async joinTabs() {
         if (!this.client) return;
-        console.log(this.client);
-        await delay(1);
-        let selected: Channel | undefined;
-        this.tabs.forEach((tab, i) => {
-            if (this.channelHub.has(tab)) {
-                this.tabs.splice(i, 1);
-                this.setTabsLS();
-                return;
-            }
-            //@ts-ignore
-            const c = new Channel({ key: tab, client: this.client, position: i });
+        const ls = localStorage.getItem('channels');
+        if (!ls) return;
+        const channels: string[] = JSON.parse(ls);
+        let selected: Channel | null = null;
+        const joins: Join[] = [];
+        channels.forEach((channel, i) => {
+            if (this.channelHub.has(channel) || !this.client) return;
+            const c = new Channel({ key: channel, client: this.client, position: i });
+            joins.push(c.join);
+            this.channelHub.set(channel, c);
             if (i === 0) selected = c;
-            c.join();
-            this.channelHub.set(tab, c);
         });
         this.selected = selected;
+
+        try {
+            await Promise.all(joins);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     connect({ username, token }: UserInfo) {

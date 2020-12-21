@@ -27,7 +27,7 @@ const createWindow = async () => {
         title: 'Twitch-IRC'
     });
     if (process.env.NODE_ENV !== 'production' && win) {
-        win.webContents.session.clearStorageData();
+        // win.webContents.session.clearStorageData();
     }
     win.on('page-title-updated', function(e) {
         e.preventDefault();
