@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import { UserInfo } from './user_info_store';
 import { Channel } from './channel';
 import { ChatUserstate, Client } from 'tmi.js';
+import { delay } from '../util';
 
 type ChannelHub = Map<string, Channel>;
 
@@ -44,18 +45,22 @@ export class TwitchStore {
         }
         channel.part();
         this.channelHub.delete(channel.key);
-        this.decPosition();
+        this.decPosition(channel.position);
         this.setTabsLS();
     }
-    decPosition() {
+    decPosition(start: number) {
+        let notIt = 0;
         for (const chan of this.channelHub.values()) {
-            if (chan.position !== 0) {
+            if (notIt === start) {
                 --chan.position;
+            } else {
+                ++notIt;
             }
         }
     }
     setNewSelected(index: number) {
-        const sel = this.tabs[index - 1] || this.tabs[index + 1];
+        const tabs = this.tabs;
+        const sel = tabs[index - 1] || tabs[index + 1];
         if (sel) {
             const channel = this.channelHub.get(sel);
             if (channel) this.selected = channel;
@@ -67,12 +72,9 @@ export class TwitchStore {
     get tabs() {
         const result: string[] = [];
         result.length = this.channelHub.size;
-        console.log({ result, hub: this.channelHub });
         for (const [k, chan] of this.channelHub.entries()) {
-            console.log(k);
             result[chan.position] = k;
         }
-        console.log(result);
         return result;
     }
     async joinTabs() {
@@ -81,21 +83,15 @@ export class TwitchStore {
         if (!ls) return;
         const channels: string[] = JSON.parse(ls);
         let selected: Channel | null = null;
-        const joins: Join[] = [];
+        await delay(1);
         channels.forEach((channel, i) => {
             if (this.channelHub.has(channel) || !this.client) return;
             const c = new Channel({ key: channel, client: this.client, position: i });
-            joins.push(c.join);
+            c.join();
             this.channelHub.set(channel, c);
             if (i === 0) selected = c;
         });
         this.selected = selected;
-
-        try {
-            await Promise.all(joins);
-        } catch (e) {
-            console.error(e);
-        }
     }
 
     connect({ username, token }: UserInfo) {
