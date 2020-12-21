@@ -65,20 +65,24 @@ export const Main = observer(({ themeStore, tc, userInfo, streamStore }: Props) 
             document.removeEventListener('keydown', handleCloseEvt);
         };
     }, []);
-
     useEffect(() => {
-        if (keys.length > 2) {
-            const copy = [...keys];
-            copy.splice(0, 1);
-            setKeys(copy);
-            return;
+        if (tc.selected && !tc.channelHub.has(tc.selected.key)) {
+            tc.selected = null;
         }
-        const shouldClose = checkKeybind(keys);
-        if (shouldClose && tc.selected) {
-            tc.partChannel(tc.selected);
-            setKeys([]);
-        }
-    }, [keys, tc.selected]);
+    }, [tc.channelHub, tc.selected]);
+    // useEffect(() => {
+    //     if (keys.length > 2) {
+    //         const copy = [...keys];
+    //         copy.splice(0, 1);
+    //         setKeys(copy);
+    //         return;
+    //     }
+    //     const shouldClose = checkKeybind(keys);
+    //     if (shouldClose && tc.selected) {
+    //         tc.partChannel(tc.selected);
+    //         setKeys([]);
+    //     }
+    // }, [keys, tc.selected]);
     return (
         <div
             className="container"

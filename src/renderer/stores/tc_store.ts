@@ -13,12 +13,8 @@ export type Message = {
     isDirect?: boolean;
 };
 
-type Join = () => Promise<void>;
-
 export class TwitchStore {
     client: Client | null = null;
-    ws: WebSocket | null = null;
-    error: string | null = null;
 
     channelHub: ChannelHub = new Map();
     selected: Channel | null = null;
@@ -40,12 +36,13 @@ export class TwitchStore {
         this.selected = c;
     }
     partChannel(channel: Channel) {
-        if (this.selected === channel) {
-            this.setNewSelected(channel.position);
-        }
+        const isSel = this.selected === channel;
         channel.part();
         this.channelHub.delete(channel.key);
         this.decPosition(channel.position);
+        if (isSel) {
+            this.setNewSelected(channel.position);
+        }
         this.setTabsLS();
     }
     decPosition(start: number) {
@@ -60,7 +57,11 @@ export class TwitchStore {
     }
     setNewSelected(index: number) {
         const tabs = this.tabs;
-        const sel = tabs[index - 1] || tabs[index + 1];
+        if (tabs.length === 0) {
+            this.selected = null;
+            return;
+        }
+        const sel = tabs[index] || tabs[index + 1] || tabs[index - 1];
         if (sel) {
             const channel = this.channelHub.get(sel);
             if (channel) this.selected = channel;
@@ -77,16 +78,16 @@ export class TwitchStore {
         }
         return result;
     }
-    async joinTabs() {
+    joinTabs() {
         if (!this.client) return;
         const ls = localStorage.getItem('channels');
         if (!ls) return;
         const channels: string[] = JSON.parse(ls);
         let selected: Channel | null = null;
-        await delay(1);
         channels.forEach((channel, i) => {
             if (this.channelHub.has(channel) || !this.client) return;
             const c = new Channel({ key: channel, client: this.client, position: i });
+            console.log(this.client);
             c.join();
             this.channelHub.set(channel, c);
             if (i === 0) selected = c;
@@ -106,8 +107,7 @@ export class TwitchStore {
             }
         });
         client.connect();
-        client.on('logon', () => {
-            console.log('logged');
+        client.on('connected', () => {
             this.client = client;
             this.joinTabs();
         });
