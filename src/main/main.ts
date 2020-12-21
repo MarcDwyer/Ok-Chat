@@ -35,7 +35,6 @@ const createWindow = async () => {
 
     win.setTitle('Twitch-IRC');
 
-    win.webContents.session.flushStorageData();
     if (process.env.NODE_ENV !== 'production') {
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'; // eslint-disable-line require-atomic-updates
         win.loadURL(`http://localhost:2003`);

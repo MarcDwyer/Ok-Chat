@@ -29,3 +29,17 @@ export function delay(ms: number): Promise<void> {
         }, ms)
     );
 }
+
+export function checkKeybind(keys: string[]) {
+    let closeKey = 0;
+    const lookFor = {
+        Control: true,
+        w: true,
+        W: true,
+        Meta: true
+    };
+    for (const key of keys) {
+        if (key in lookFor) ++closeKey;
+    }
+    return closeKey >= 2;
+}

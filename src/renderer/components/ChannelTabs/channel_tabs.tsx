@@ -62,7 +62,7 @@ export const ChannelTabs = observer(({ tc, theme }: Props) => {
                             <AiOutlineClose
                                 onClick={e => {
                                     e.stopPropagation();
-                                    tc.partChannel(tab, i);
+                                    tc.partChannel(c);
                                 }}
                             />
                         </Tab>

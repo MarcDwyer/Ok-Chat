@@ -1,14 +1,13 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { GeneralColors } from '../../general_colors';
-import { Channel } from '../../stores/channel';
-import { Message } from '../../stores/tc_store';
+import { Message, TwitchStore } from '../../stores/tc_store';
 import { ChatBox } from '../ChatBox/chatbox';
 
 import './chat.scss';
 
 type Props = {
-    selected: Channel | undefined;
+    tc: TwitchStore;
 };
 function getMsgStyle(m: Message) {
     const result = {
@@ -26,7 +25,8 @@ function getMsgStyle(m: Message) {
     }
     return result;
 }
-export const Chat = observer(({ selected }: Props) => {
+export const Chat = observer(({ tc }: Props) => {
+    const { selected } = tc;
     return (
         <>
             {!selected && <div>Try joining a channel...</div>}

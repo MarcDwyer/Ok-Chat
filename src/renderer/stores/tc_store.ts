@@ -44,16 +44,13 @@ export class TwitchStore {
         if (!c.joined) c.join();
         this.selected = c;
     }
-    partChannel(channel: string, index: number) {
-        const chan = this.channelHub.get(channel);
-        if (chan) {
-            if (this.selected && this.selected.key === channel) {
-                this.setNewSelected(index);
-            }
-            chan.part();
-            this.channelHub.delete(channel);
+    partChannel(channel: Channel) {
+        if (this.selected === channel) {
+            this.setNewSelected(channel.position);
         }
-        this.tabs.splice(index, 1);
+        channel.part();
+        this.channelHub.delete(channel.key);
+        this.tabs.splice(channel.position, 1);
         this.setTabsLS();
     }
     setNewSelected(index: number) {
@@ -68,9 +65,15 @@ export class TwitchStore {
     }
     async joinTabs() {
         if (!this.client) return;
+        console.log(this.client);
         await delay(1);
         let selected: Channel | undefined;
         this.tabs.forEach((tab, i) => {
+            if (this.channelHub.has(tab)) {
+                this.tabs.splice(i, 1);
+                this.setTabsLS();
+                return;
+            }
             //@ts-ignore
             const c = new Channel({ key: tab, client: this.client, position: i });
             if (i === 0) selected = c;

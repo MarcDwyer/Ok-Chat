@@ -36,7 +36,6 @@ export class Channel {
     }
     part() {
         this.client.part(this.key).then(() => (this.joined = false));
-        this.joined = false;
     }
 
     send(msg: string) {
