@@ -71,7 +71,6 @@ export class Channel {
     }
     initPause() {
         this.pause = true;
-        console.log(`init ${this.pause}`);
         this.snapshot = [...this.messages];
     }
     endPause() {

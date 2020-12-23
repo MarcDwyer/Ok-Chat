@@ -1,4 +1,4 @@
-import { action, computed, makeAutoObservable, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 import { UserInfo } from './user_info_store';
 import { Channel } from './channel';
 import { ChatUserstate, Client } from 'tmi.js';

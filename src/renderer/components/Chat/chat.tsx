@@ -38,17 +38,22 @@ function getMsgStyle(m: Message) {
     }
     return result;
 }
+type Users = Record<string, boolean>;
 
 export const Chat = observer(({ tc }: Props) => {
     const chatDiv = useRef<any>();
     const isCurr = chatDiv && chatDiv.current;
     const { selected } = tc;
 
-    const shouldPause = useCallback(() => {
-        if (!selected || (selected && selected.pause)) return;
+    const handlePause = useCallback(() => {
+        if (!selected) return;
         const c = chatDiv.current as HTMLDivElement;
+        console.log(c.scrollTop);
         if (c.scrollTop !== 0 && !selected.pause) {
             selected.initPause();
+        } else if (c.scrollTop >= -25 && selected.pause) {
+            selected.endPause();
+            c.scrollTo({ top: 0 });
         }
     }, [tc.selected]);
 
@@ -61,7 +66,7 @@ export const Chat = observer(({ tc }: Props) => {
                     const msgs = selected.pause ? selected.snapshot : selected.messages;
                     return (
                         <div className="selected">
-                            <div className="chat" onScroll={shouldPause} ref={chatDiv}>
+                            <div className="chat" onScroll={handlePause} ref={chatDiv}>
                                 {isError && <span className="chan error">{selected.error}</span>}
                                 {msgs.map(msg => {
                                     return (

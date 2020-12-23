@@ -1,10 +1,11 @@
 ✔ Channel tabs require ordered state, change to array of strings @done(20-12-21 00:09)
 ✔ Listen to Ctrl+W events to close selected tab @started(20-12-21 00:09) @done(20-12-21 00:09) @lasted(59s)
-☐ Pause the chat when scrolling, when done scrolling resume chat. (UI Chat should not be updated but state should) @started(20-12-22 19:07)
+✔ Pause the chat when scrolling, when done scrolling resume chat. (UI Chat should not be updated but state should) @started(20-12-22 19:07) @done(20-12-22 22:38) @lasted(3h31m9s)
 ☐ Add button to hide follower bar
 ☐ Impl twitch's irc events to channels
 ☐ Add ability to click on individual users to display more info
 ☐ Impl BTTVs emotes and Twitch's
-☐ Fix chat not re-rendering on undefined
-☐ Replace index keys of elements for nano id keys
-☐ Impl @ to autofill users in the chat (to directmsg)
+✔ Fix chat not re-rendering on undefined @done(20-12-23 00:22)
+✔ Replace index keys of elements for nano id keys @done(20-12-23 00:22)
+☐ Impl @ to autofill users in the chat (to directmsg) @started(20-12-23 01:26)
+☐ Input should resize itself depending on the amount of characters within it
