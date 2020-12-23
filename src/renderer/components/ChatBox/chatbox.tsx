@@ -13,13 +13,12 @@ type InputProps = {
     isChannel: boolean;
 };
 
-const MyChatBox = styled.textarea<InputProps>`
-    width: 100%;
+const MyChatBox = styled.input<InputProps>`
+    width: 90%;
     background-color: ${p => (p.isChannel ? 'rgba(255,255,255,.1)' : 'rgba(255,255,255,.055)')};
     border: none;
     border-radius: 10px;
-    width: 95%;
-    padding: 10px 10px;
+    padding: 15px 15px;
     margin: auto;
     outline: none;
     color: #eee;
@@ -35,16 +34,15 @@ export const ChatBox = observer(({ selected }: Props) => {
         setMsg('');
     }, [selected]);
     return (
-        <div
+        <form
             className="chat-box"
-            onKeyDown={e => {
+            onSubmit={e => {
+                e.preventDefault();
                 if (!msg.length) {
                     return;
                 }
-                if (e.key === 'Enter') {
-                    selected.send(msg);
-                    setMsg('');
-                }
+                selected.send(msg);
+                setMsg('');
             }}
         >
             <MyChatBox
@@ -55,6 +53,6 @@ export const ChatBox = observer(({ selected }: Props) => {
                 onChange={e => setMsg(e.target.value)}
                 autoFocus={true}
             />
-        </div>
+        </form>
     );
 });

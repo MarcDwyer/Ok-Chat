@@ -1,8 +1,8 @@
-import { makeAutoObservable } from 'mobx';
+import { action, computed, makeAutoObservable, makeObservable, observable } from 'mobx';
 import { UserInfo } from './user_info_store';
 import { Channel } from './channel';
 import { ChatUserstate, Client } from 'tmi.js';
-import { delay } from '../util';
+import { nanoid } from 'nanoid';
 
 type ChannelHub = Map<string, Channel>;
 
@@ -10,6 +10,7 @@ export type Message = {
     userData: ChatUserstate;
     message: string;
     self: boolean;
+    id: string;
     isDirect?: boolean;
 };
 
@@ -17,10 +18,21 @@ export class TwitchStore {
     client: Client | null = null;
 
     channelHub: ChannelHub = new Map();
+
     selected: Channel | null = null;
 
     constructor() {
-        makeAutoObservable(this);
+        makeObservable(this, {
+            channelHub: observable,
+            selected: observable,
+            joinChannel: action,
+            partChannel: action,
+            decPosition: action,
+            setNewSelected: action,
+            joinTabs: action,
+            tabs: computed,
+            connect: action
+        });
     }
     joinChannel(chanName: string) {
         if (!this.client) throw new Error('No client conn has been established');
@@ -71,8 +83,7 @@ export class TwitchStore {
         localStorage.setItem('channels', JSON.stringify(this.tabs));
     }
     get tabs() {
-        const result: string[] = [];
-        result.length = this.channelHub.size;
+        const result: string[] = new Array(this.channelHub.size);
         for (const [k, chan] of this.channelHub.entries()) {
             result[chan.position] = k;
         }
@@ -115,7 +126,7 @@ export class TwitchStore {
             const c = this.channelHub.get(channel);
             if (c) {
                 const isDirect = message.toLowerCase().includes(username);
-                const m: Message = { userData: tags, message, self, isDirect };
+                const m: Message = { userData: tags, message, self, isDirect, id: nanoid() };
                 c.handleMsg(m);
             }
         });

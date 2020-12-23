@@ -1,4 +1,5 @@
-import { makeAutoObservable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
+import { nanoid } from 'nanoid';
 import { Client } from 'tmi.js';
 import { Message } from './tc_store';
 
@@ -8,7 +9,11 @@ type ChannelData = {
     key: string;
 };
 export class Channel {
-    client: Client;
+    id: string = nanoid(10);
+    limit = 10;
+    pause: boolean = false;
+    snapshot: Message[] = [];
+
     key: string;
     position: number;
 
@@ -16,11 +21,25 @@ export class Channel {
     joined: boolean = false;
     error: string | null = null;
 
+    private client: Client;
+
     constructor({ client, position, key }: ChannelData) {
         this.client = client;
         this.position = position;
         this.key = key;
-        makeAutoObservable(this);
+        makeObservable(this, {
+            pause: observable,
+            snapshot: observable,
+            messages: observable,
+            error: observable,
+            joined: observable,
+            position: observable,
+            join: action,
+            part: action,
+            handleMsg: action,
+            initPause: action,
+            endPause: action
+        });
     }
 
     async join() {
@@ -49,5 +68,14 @@ export class Channel {
             msgs.length = limit - 25;
         }
         this.messages = [m, ...msgs];
+    }
+    initPause() {
+        this.pause = true;
+        console.log(`init ${this.pause}`);
+        this.snapshot = [...this.messages];
+    }
+    endPause() {
+        this.snapshot = [];
+        this.pause = false;
     }
 }

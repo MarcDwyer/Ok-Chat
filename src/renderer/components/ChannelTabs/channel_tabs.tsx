@@ -38,16 +38,19 @@ const Tab = styled.div<TabProps>`
         margin: auto;
     }
 `;
+
 export const ChannelTabs = observer(({ tc, theme }: Props) => {
     const { selected, tabs } = tc;
     return (
         <div className="main-tab">
             {tabs.length !== 0 &&
-                tabs.map((tab, i) => {
+                tabs.map(tab => {
                     const c = tc.channelHub.get(tab);
                     if (!c) {
                         return null;
                     }
+                    const charLimit = 8;
+                    const name = tab.length > charLimit ? tab.substr(0, 8) + '...' : tab;
                     const isSel = selected === c;
                     return (
                         <Tab
@@ -56,9 +59,9 @@ export const ChannelTabs = observer(({ tc, theme }: Props) => {
                             isSel={isSel}
                             shadeOne={theme.shadeOne}
                             shadeTwo={theme.shadeTwo}
-                            key={i}
+                            key={c.id}
                         >
-                            <span>{tab}</span>
+                            <span>{name}</span>
                             <AiOutlineClose
                                 onClick={e => {
                                     e.stopPropagation();

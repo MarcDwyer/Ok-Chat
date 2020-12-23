@@ -145,6 +145,7 @@
         "react-icons": "^4.1.0",
         "shortid": "^2.2.16",
         "styled-components": "^5.2.1",
-        "tmi.js": "^1.7.0"
+        "tmi.js": "^1.7.0",
+        "use-debounce": "^5.2.0"
     }
 }

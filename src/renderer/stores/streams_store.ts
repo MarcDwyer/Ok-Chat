@@ -7,7 +7,6 @@ export class StreamStore {
     followers: StreamData[] | null = null;
     error: string | null = null;
 
-    private attempts: number = 0;
     private clientId: string = 'asgecphfrtm5zx5gdykx22ogwtpvu5';
     private refresh: number | null = null;
 
@@ -15,28 +14,17 @@ export class StreamStore {
         makeAutoObservable(this);
     }
     async getFollowers() {
-        try {
-            console.log('getting followers');
-            const follows = await this.fetchV5TwitchData<V5StreamersPayload>(
-                `https://api.twitch.tv/kraken/streams/followed`
-            );
-            if (follows && follows.streams) {
-                this.followers = follows.streams;
-            }
-            this.attempts = 0;
-        } catch (e) {
-            console.error(e);
-            if (this.attempts <= 3) {
-                setTimeout(() => this.getFollowers(), 3500);
-            } else {
-                this.error = "Couldn't fetch follower data";
-            }
-            ++this.attempts;
+        console.log('getting followers');
+        const follows = await this.fetchV5TwitchData<V5StreamersPayload>(
+            `https://api.twitch.tv/kraken/streams/followed`
+        );
+        if (follows && follows.streams) {
+            this.followers = follows.streams;
         }
     }
     init(info: UserInfo) {
         this.info = info;
-        this.getFollowers();
+        this.getFollowers().catch(_ => setTimeout(() => this.getFollowers(), 5500));
         this.refresh = setInterval(() => {
             this.getFollowers();
         }, 60000 * 5);
