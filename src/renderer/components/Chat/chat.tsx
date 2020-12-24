@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useRef, useCallback } from 'react';
 import { GeneralColors } from '../../general_colors';
 import { Message, TwitchStore } from '../../stores/tc_store';
-import { ChatBox } from '../ChatBox/chatbox';
+import ChatBox from '../ChatBox/chatbox';
 import styled from 'styled-components';
 
 import './chat.scss';

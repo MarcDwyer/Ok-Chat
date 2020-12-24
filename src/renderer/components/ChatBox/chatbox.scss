@@ -1,6 +1,18 @@
-.chat-box {
-    width: 100%;
-    margin: 10px auto 10px auto;
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  height: auto;
+  background-color: transparent;
+
+  .find-user {
     display: flex;
-    resize: vertical;
+    flex-direction: column-reverse;
+    width: 125px;
+    border: solid 1px blue;
+    background-color: black;
+    color: #eee;
+    z-index: 5000;
+  }
 }

@@ -1,35 +1,36 @@
 .selected {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  .chat {
+    position: relative;
+    display: flex;
+    flex-direction: column-reverse;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    .chat {
-        display: flex;
-        flex-direction: column-reverse;
-        width: 100%;
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-        .message {
-            display: flex;
-            padding: 5px 5px;
+    .message {
+      display: flex;
+      padding: 5px 5px;
 
-            .actual-msg {
-                margin-left: 5px;
-            }
+      .actual-msg {
+        margin-left: 5px;
+      }
 
-            .author {
-                font-weight: bold;
-            }
-        }
+      .author {
+        font-weight: bold;
+      }
     }
+  }
 }
 
 .directmsg {
-    background-color: rgba(176, 9, 35, 0.74);
+  background-color: rgba(176, 9, 35, 0.74);
 }
 .self {
-    background-color: rgba(0, 0, 255, 0.24);
+  background-color: rgba(0, 0, 255, 0.24);
 }

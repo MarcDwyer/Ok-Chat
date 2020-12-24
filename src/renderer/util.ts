@@ -43,3 +43,8 @@ export function checkKeybind(keys: string[]) {
     }
     return closeKey >= 2;
 }
+
+export function isAlpha(s: string) {
+    const reg = /^[a-z0-9]+$/i;
+    return reg.test(s);
+}
