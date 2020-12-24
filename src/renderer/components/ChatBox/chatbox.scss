@@ -10,9 +10,10 @@ form {
     display: flex;
     flex-direction: column-reverse;
     width: 125px;
-    border: solid 1px blue;
-    background-color: black;
+    background-color: rgb(35, 38, 43);
     color: #eee;
     z-index: 5000;
+    border-radius: 5px;
+    padding: 10px 10px;
   }
 }

@@ -4,13 +4,15 @@ import styled from "styled-components";
 
 import "./chatbox.scss";
 import { observer } from "mobx-react-lite";
-import { action, computed, makeObservable, observable } from "mobx";
+import { SearchStore } from "../../stores/search_store";
+
+import { FindUser } from "./find_user";
 
 interface InitProps {
   selected: Channel;
 }
 interface ExtendedProps extends InitProps {
-  searchStore: SearchStore;
+  ss: SearchStore;
 }
 type InputProps = {
   isChannel: boolean;
@@ -29,94 +31,36 @@ const MyChatBox = styled.textarea<InputProps>`
   font-size: 18px;
   resize: vertical;
 `;
-type HandleCharConfig = {
-  index: number;
-  value: string;
-};
-class SearchStore {
-  msg: string = "";
-  index: number | null = null;
-  constructor() {
-    makeObservable(this, {
-      query: computed,
-      msg: observable,
-      index: observable,
-      handleChange: action,
-      handleKey: action,
-    });
-  }
-  get query() {
-    const { index, msg } = this;
-    if (index === null) {
-      return "";
-    }
-    let q: string = "";
-    for (let x = index + 1; x < msg.length; ++x) {
-      const curr = msg[x];
-      if (curr === " ") break;
-      q += curr;
-    }
-    return q;
-  }
-  handleChange({ index, value }: HandleCharConfig) {
-    const curr = value[index];
-    this.msg = value;
-    if (this.index && value[this.index] !== "@") {
-      this.index = null;
-      return;
-    }
-    if (curr === " " && this.index !== null) {
-      this.index = null;
-      return;
-    }
-    if (curr === "@") {
-      this.index = index;
-    }
-  }
-  handleKey(key: string) {}
-}
-type FindProps = {
-  selected: Channel;
-  query: string;
-};
-const FindUser = observer(({ selected, query }: FindProps) => {
-  const msgs = selected.pause ? selected.snapshot : selected.messages;
-  const founds = msgs.filter((msg) => {
-    const name = msg.userData["display-name"]?.toLowerCase();
-    if (name?.startsWith(query.toLowerCase())) {
-      return msg;
-    }
-  });
-  console.log(query);
-  return (
-    <div className="find-user">
-      {founds.map((found) => {
-        found.userData["display-name"];
-        return (
-          <div key={found.id} className="found">
-            {found.userData["display-name"]}
-          </div>
-        );
-      })}
-    </div>
-  );
-});
-const ChatBox = observer(({ selected, searchStore }: ExtendedProps) => {
+
+const ChatBox = observer(({ selected, ss }: ExtendedProps) => {
   const isChannel = Boolean(selected);
   return (
-    <form onKeyDown={(e) => searchStore.handleKey(e.key)}>
-      {searchStore.index !== null && searchStore.query.length !== 0 && (
-        <FindUser selected={selected} query={searchStore.query} />
+    <form
+      onKeyDown={(e) => {
+        if (ss.searchMode) {
+          ss.handleKey(e.key);
+          return;
+        }
+        switch (e.key) {
+          case "Enter":
+            selected.send(ss.msg);
+            ss.reset();
+            e.preventDefault();
+        }
+      }}
+    >
+      {ss.searchMode && ss.query.length !== 0 && (
+        <FindUser messages={selected.messages} query={ss.query} />
       )}
       <MyChatBox
         isChannel={isChannel}
         disabled={!isChannel}
         placeholder="Whats your message?"
-        value={searchStore.msg}
+        value={ss.msg}
         onChange={(e) => {
           const index = e.target.selectionStart - 1;
           const value = e.target.value;
-          searchStore.handleChange({ index, value });
+          ss.handleChange({ index, value });
         }}
         autoFocus={true}
       />
@@ -124,8 +68,8 @@ const ChatBox = observer(({ selected, searchStore }: ExtendedProps) => {
   );
 });
 
-const searchStore = new SearchStore();
+const srchStore = new SearchStore();
 
 export default (p: InitProps) => (
-  <ChatBox selected={p.selected} searchStore={searchStore} />
+  <ChatBox selected={p.selected} ss={srchStore} />
 );

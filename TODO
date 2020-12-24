@@ -10,4 +10,5 @@
 ☐ Impl @ to autofill users in the chat (to directmsg) @started(20-12-23 01:26)
     Seems that twitch & twitter do a loop over and reverse loop of a word in a string
     to detect if user is attempting to make a user find query.
+☐ Fix duplicate find user results in ChatBox's FindUser component @started(20-12-23 23:25)
 ☐ Input should resize itself depending on the amount of characters within it
