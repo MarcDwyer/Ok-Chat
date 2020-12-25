@@ -9,7 +9,7 @@ import Login from "../Login/login";
 import { EnterUser } from "../EnterUsername/enter_user";
 import { Followers } from "../Followed/followers";
 import { ChannelTabs } from "../ChannelTabs/channel_tabs";
-import { Chat } from "../Chat/chat";
+import Chat from "../Chat/chat";
 
 import "./main.scss";
 import { StreamStore } from "../../stores/streams_store";
@@ -28,13 +28,6 @@ export const Main = observer(
   ({ themeStore, tc, userInfo, streamStore }: Props) => {
     const { themeData } = themeStore;
     const { token, username } = userInfo;
-
-    const [keys, setKeys] = useState<string[]>([]);
-
-    const handleCloseEvt = (e: KeyboardEvent) =>
-      setKeys((p) => {
-        return [...p, e.key];
-      });
 
     useEffect(() => {
       if (username && token) {
@@ -56,13 +49,6 @@ export const Main = observer(
       return function() {
         console.log("closing...");
         tc.client?.disconnect();
-      };
-    }, []);
-    useEffect(() => {
-      document.addEventListener("keydown", handleCloseEvt);
-
-      return function() {
-        document.removeEventListener("keydown", handleCloseEvt);
       };
     }, []);
     useEffect(() => {

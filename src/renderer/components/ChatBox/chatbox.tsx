@@ -6,20 +6,17 @@ import "./chatbox.scss";
 import { observer } from "mobx-react-lite";
 import { SearchStore } from "../../stores/search_store";
 
-import { FindUser } from "./find_user";
-
-interface InitProps {
+interface Props {
+  ss: SearchStore;
   selected: Channel;
 }
-interface ExtendedProps extends InitProps {
-  ss: SearchStore;
-}
+
 type InputProps = {
   isChannel: boolean;
 };
 
 const MyChatBox = styled.textarea<InputProps>`
-  width: 95%;
+  width: 100%;
   background-color: ${(p) =>
     p.isChannel ? "rgba(255,255,255,.1)" : "rgba(255,255,255,.055)"};
   border: none;
@@ -32,7 +29,7 @@ const MyChatBox = styled.textarea<InputProps>`
   resize: vertical;
 `;
 
-const ChatBox = observer(({ selected, ss }: ExtendedProps) => {
+export const ChatBox = observer(({ selected, ss }: Props) => {
   const isChannel = Boolean(selected);
   return (
     <form
@@ -49,9 +46,6 @@ const ChatBox = observer(({ selected, ss }: ExtendedProps) => {
         }
       }}
     >
-      {ss.searchMode && ss.query.length !== 0 && (
-        <FindUser messages={selected.messages} query={ss.query} />
-      )}
       <MyChatBox
         isChannel={isChannel}
         disabled={!isChannel}
@@ -67,9 +61,3 @@ const ChatBox = observer(({ selected, ss }: ExtendedProps) => {
     </form>
   );
 });
-
-const srchStore = new SearchStore();
-
-export default (p: InitProps) => (
-  <ChatBox selected={p.selected} ss={srchStore} />
-);

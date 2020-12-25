@@ -1,17 +1,20 @@
 .selected {
-  width: 100%;
+  width: 95%;
+  margin: auto;
   height: 100%;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
   .chat {
-    position: relative;
     display: flex;
     flex-direction: column-reverse;
     width: 100%;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-bottom: 5px;
+    margin-top: 5px;
 
     .message {
       display: flex;
@@ -27,7 +30,25 @@
     }
   }
 }
+.find-user {
+  position: absolute;
+  bottom: 75px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  left: 5px;
+  display: flex;
+  flex-direction: column-reverse;
+  width: 125px;
+  background-color: rgb(35, 38, 43);
+  color: #eee;
+  z-index: 5000;
+  border-radius: 5px;
+  padding: 10px 10px;
 
+  .found {
+    padding: 5px 5px;
+  }
+}
 .directmsg {
   background-color: rgba(176, 9, 35, 0.74);
 }

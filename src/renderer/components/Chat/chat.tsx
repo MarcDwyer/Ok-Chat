@@ -1,14 +1,17 @@
 import { observer } from "mobx-react-lite";
 import React, { useRef, useCallback } from "react";
-import { GeneralColors } from "../../general_colors";
-import { Message, TwitchStore } from "../../stores/tc_store";
-import ChatBox from "../ChatBox/chatbox";
+import { TwitchStore } from "../../stores/tc_store";
+import { ChatBox } from "../ChatBox/chatbox";
 import styled from "styled-components";
 
 import "./chat.scss";
+import { getMsgStyle } from "../../util";
+import { SearchStore } from "../../stores/search_store";
+import { FindUser } from "./find_user";
 
 type Props = {
   tc: TwitchStore;
+  ss: SearchStore;
 };
 
 const PauseBtn = styled.button`
@@ -16,45 +19,34 @@ const PauseBtn = styled.button`
   margin: auto;
   font-size: 14px;
   height: 20px;
+  background-color: transparent;
   background-color: #6441a5;
   border: none;
   outline: none;
+
   cursor: pointer;
   color: #eee;
-`;
-function getMsgStyle(m: Message) {
-  const result = {
-    backgroundColor: "",
-  };
-  if (m.isDirect) {
-    result.backgroundColor = GeneralColors.directMsg;
-    return result;
-  }
-  if (m.self) {
-    result.backgroundColor = GeneralColors.selfMsg;
-  }
-  if (m.userData.mod) {
-    result.backgroundColor = GeneralColors.modMsg;
-  }
-  return result;
-}
 
-export const Chat = observer(({ tc }: Props) => {
+  span {
+    margin: 5px auto 5px auto;
+  }
+`;
+
+export const Chat = observer(({ tc, ss }: Props) => {
   const chatDiv = useRef<any>();
   const isCurr = chatDiv && chatDiv.current;
   const { selected } = tc;
 
-  const handlePause = () => {
+  const handlePause = useCallback(() => {
     if (!selected) return;
     const c = chatDiv.current as HTMLDivElement;
-    console.log(c.scrollTop);
     if (c.scrollTop !== 0 && !selected.pause) {
       selected.initPause();
     } else if (c.scrollTop >= -45 && selected.pause) {
       selected.endPause();
       c.scrollTo({ top: 0 });
     }
-  };
+  }, [selected]);
 
   return (
     <>
@@ -85,6 +77,9 @@ export const Chat = observer(({ tc }: Props) => {
                     </div>
                   );
                 })}
+                {ss.searchMode && (
+                  <FindUser query={ss.query} messages={selected.messages} />
+                )}
               </div>
               {selected.pause && isCurr && (
                 <PauseBtn
@@ -94,13 +89,18 @@ export const Chat = observer(({ tc }: Props) => {
                     selected.endPause();
                   }}
                 >
-                  Click to resume chat
+                  <span>Click to unpause chat</span>
                 </PauseBtn>
               )}
-              <ChatBox selected={selected} />
+              <ChatBox selected={selected} ss={ss} />
             </div>
           );
         })()}
     </>
   );
 });
+
+interface InitProps {
+  tc: TwitchStore;
+}
+export default ({ tc }: InitProps) => <Chat tc={tc} ss={new SearchStore()} />;

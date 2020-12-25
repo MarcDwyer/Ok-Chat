@@ -16,7 +16,6 @@ export const FindUser = observer(({ messages, query }: FindProps) => {
       return msg;
     }
   });
-
   return (
     <div className="find-user">
       {founds.map((found) => {
