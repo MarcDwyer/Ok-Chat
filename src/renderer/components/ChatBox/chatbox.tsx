@@ -28,13 +28,23 @@ const MyChatBox = styled.textarea<InputProps>`
   font-size: 18px;
   resize: vertical;
 `;
-
+enum ArrowKeys {
+  ArrowUp,
+  ArrowDown,
+  Enter,
+  Tab,
+}
 export const ChatBox = observer(({ selected, ss }: Props) => {
   const isChannel = Boolean(selected);
   return (
     <form
       onKeyDown={(e) => {
-        if (ss.searchMode) return;
+        if (ss.searchMode && e.key in ArrowKeys) {
+          ss.handleKey(e.key);
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
         switch (e.key) {
           case "Enter":
             selected.send(ss.msg);

@@ -33,10 +33,6 @@ const PauseBtn = styled.button`
   }
 `;
 
-const ArrowsKeys = {
-  ArrowUp: true,
-  ArrowDown: true,
-};
 export const Chat = observer(({ selected, ss }: Props) => {
   const chatDiv = useRef<any>();
   const isCurr = chatDiv && chatDiv.current;
@@ -60,9 +56,9 @@ export const Chat = observer(({ selected, ss }: Props) => {
   useEffect(() => {
     console.log({ sm: ss.searchMode, sn: ss.snapshot, q: ss.query });
     if (ss.searchMode && ss.snapshot) {
-      ss.updateResults();
+      ss.updateResults(selected.channelName);
     }
-  }, [ss.query, ss.searchMode, ss.snapshot]);
+  }, [selected.channelName, ss.query, ss.searchMode, ss.snapshot]);
   return (
     <>
       {!selected && <div>Try joining a channel...</div>}
@@ -70,16 +66,7 @@ export const Chat = observer(({ selected, ss }: Props) => {
         (() => {
           const isError = Boolean(selected.error);
           return (
-            <div
-              className="selected"
-              onKeyDown={(e) => {
-                if (ss.searchMode && e.key in ArrowsKeys) {
-                  ss.handleKey(e.key);
-                  e.stopPropagation();
-                  return;
-                }
-              }}
-            >
+            <div className="selected">
               <div className="chat" onScroll={handlePause} ref={chatDiv}>
                 {isError && (
                   <span className="chan error">{selected.error}</span>

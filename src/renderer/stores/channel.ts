@@ -30,6 +30,7 @@ export class Channel {
     makeObservable(this, {
       pause: observable,
       messages: computed,
+      channelName: computed,
       error: observable,
       snapshotMsg: observable,
       liveMsg: observable,
@@ -80,5 +81,8 @@ export class Channel {
   }
   get messages(): Message[] {
     return this.pause ? this.snapshotMsg : this.liveMsg;
+  }
+  get channelName() {
+    return this.key.substr(1, this.key.length - 1);
   }
 }

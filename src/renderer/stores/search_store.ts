@@ -1,5 +1,4 @@
 import { action, computed, makeObservable, observable } from "mobx";
-import { ThemeProvider } from "styled-components";
 import { Message } from "./tc_store";
 
 type HandleCharConfig = {
@@ -51,7 +50,7 @@ export class SearchStore {
         }
         break;
       case "@":
-        if (!this.searchMode) {
+        if (!searchMode) {
           this.startIndex = index;
         }
         this.query = "";
@@ -97,15 +96,35 @@ export class SearchStore {
     }
   }
   handleKey(key: string) {
+    console.log(key);
+    const { users, index } = this.results;
+    const { msg, startIndex } = this;
+    let next = index;
     switch (key) {
+      case "Tab":
+      case "Enter":
+        console.log(startIndex);
+        if (!this.searchMode) return;
+        const channel = users[index];
+        console.log(channel);
+        //@ts-ignore
+        let i = startIndex + 1;
+        this.msg = msg.slice(0, i) + channel + msg.slice(i, msg.length);
+        this.startIndex = null;
+        break;
       case "ArrowUp":
-        // ++this.selected;
+        ++next;
         break;
       case "ArrowDown":
-      // --this.selected;
+        --next;
     }
+    if (!users[next]) {
+      next = 0;
+    }
+    console.log(next);
+    this.results.index = next;
   }
-  updateResults() {
+  updateResults(channel: string) {
     if (!this.snapshot) {
       console.log("no snapshot");
       return;
@@ -114,24 +133,19 @@ export class SearchStore {
     const { query } = this;
     const msgs = this.snapshot;
     let q = query.toLowerCase();
-    let index = this.results.index;
 
     const dups = new Map<string, boolean>();
-    const founds = msgs
-      .filter((msg) => {
-        const dn = msg.userData["display-name"]?.toLowerCase() as string;
-        if (!dups.has(dn) && dn.startsWith(q)) {
-          dups.set(dn, true);
-          return msg;
-        }
-      })
-      .map((user) => user.userData["display-name"] as string);
-    console.log(founds);
-    const sel = founds[index];
-    if (!sel) {
-      index = 0;
-    }
-    this.results.index = index;
+    let names = msgs.map((msg) => {
+      const name = msg.userData["display-name"]?.toLowerCase() || "";
+      return name;
+    });
+    names = [channel, ...names];
+    const founds = names.filter((name) => {
+      if (!dups.has(name) && name.startsWith(q)) {
+        dups.set(name, true);
+        return name;
+      }
+    });
     this.results.users = founds;
   }
 }
