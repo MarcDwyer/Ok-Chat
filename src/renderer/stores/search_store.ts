@@ -94,6 +94,7 @@ export class SearchStore {
           query += c;
       }
     }
+    console.log(query);
   }
   handleKey(key: string) {
     console.log(key);
@@ -121,15 +122,12 @@ export class SearchStore {
     if (!users[next]) {
       next = 0;
     }
-    console.log(next);
     this.results.index = next;
   }
   updateResults(channel: string) {
     if (!this.snapshot) {
-      console.log("no snapshot");
       return;
     }
-    console.log("updating...");
     const { query } = this;
     const msgs = this.snapshot;
     let q = query.toLowerCase();
@@ -146,6 +144,11 @@ export class SearchStore {
         return name;
       }
     });
+    const { index } = this.results;
+    if (!founds[index]) {
+      this.results.index = 0;
+    }
+    console.log(query);
     this.results.users = founds;
   }
 }

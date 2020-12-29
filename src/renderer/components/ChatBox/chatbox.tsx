@@ -63,7 +63,11 @@ export const ChatBox = observer(({ selected, ss }: Props) => {
           const value = e.target.value;
           ss.handleChange({ index, value });
         }}
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck="false"
         autoFocus={true}
+        autoComplete="off"
       />
     </form>
   );

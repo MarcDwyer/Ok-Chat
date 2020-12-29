@@ -54,7 +54,6 @@ export const Chat = observer(({ selected, ss }: Props) => {
     }
   }, [ss.searchMode]);
   useEffect(() => {
-    console.log({ sm: ss.searchMode, sn: ss.snapshot, q: ss.query });
     if (ss.searchMode && ss.snapshot) {
       ss.updateResults(selected.channelName);
     }
