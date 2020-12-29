@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useEffect } from "react";
 import { TwitchStore } from "../../stores/tc_store";
 import { ChatBox } from "../ChatBox/chatbox";
 import styled from "styled-components";
@@ -8,10 +8,11 @@ import "./chat.scss";
 import { getMsgStyle } from "../../util";
 import { SearchStore } from "../../stores/search_store";
 import { FindUser } from "./find_user";
+import { Channel } from "../../stores/channel";
 
 type Props = {
-  tc: TwitchStore;
   ss: SearchStore;
+  selected: Channel;
 };
 
 const PauseBtn = styled.button`
@@ -32,10 +33,13 @@ const PauseBtn = styled.button`
   }
 `;
 
-export const Chat = observer(({ tc, ss }: Props) => {
+const ArrowsKeys = {
+  ArrowUp: true,
+  ArrowDown: true,
+};
+export const Chat = observer(({ selected, ss }: Props) => {
   const chatDiv = useRef<any>();
   const isCurr = chatDiv && chatDiv.current;
-  const { selected } = tc;
 
   const handlePause = useCallback(() => {
     if (!selected) return;
@@ -48,6 +52,17 @@ export const Chat = observer(({ tc, ss }: Props) => {
     }
   }, [selected]);
 
+  useEffect(() => {
+    if (ss.searchMode) {
+      ss.snapshot = [...selected.messages];
+    }
+  }, [ss.searchMode]);
+  useEffect(() => {
+    console.log({ sm: ss.searchMode, sn: ss.snapshot, q: ss.query });
+    if (ss.searchMode && ss.snapshot) {
+      ss.updateResults();
+    }
+  }, [ss.query, ss.searchMode, ss.snapshot]);
   return (
     <>
       {!selected && <div>Try joining a channel...</div>}
@@ -55,7 +70,16 @@ export const Chat = observer(({ tc, ss }: Props) => {
         (() => {
           const isError = Boolean(selected.error);
           return (
-            <div className="selected">
+            <div
+              className="selected"
+              onKeyDown={(e) => {
+                if (ss.searchMode && e.key in ArrowsKeys) {
+                  ss.handleKey(e.key);
+                  e.stopPropagation();
+                  return;
+                }
+              }}
+            >
               <div className="chat" onScroll={handlePause} ref={chatDiv}>
                 {isError && (
                   <span className="chan error">{selected.error}</span>
@@ -77,9 +101,7 @@ export const Chat = observer(({ tc, ss }: Props) => {
                     </div>
                   );
                 })}
-                {ss.searchMode && (
-                  <FindUser query={ss.query} messages={selected.messages} />
-                )}
+                {ss.searchMode && <FindUser results={ss.results} />}
               </div>
               {selected.pause && isCurr && (
                 <PauseBtn
@@ -101,6 +123,8 @@ export const Chat = observer(({ tc, ss }: Props) => {
 });
 
 interface InitProps {
-  tc: TwitchStore;
+  selected: Channel;
 }
-export default ({ tc }: InitProps) => <Chat tc={tc} ss={new SearchStore()} />;
+export default ({ selected }: InitProps) => (
+  <Chat selected={selected} ss={new SearchStore()} />
+);

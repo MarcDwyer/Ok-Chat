@@ -75,10 +75,12 @@ export const Main = observer(
               themeStore={themeStore}
               tc={tc}
             />
-            <div className="inner-app">
-              <ChannelTabs tc={tc} theme={themeData} />
-              <Chat tc={tc} />
-            </div>
+            {tc.selected && (
+              <div className="inner-app">
+                <ChannelTabs tc={tc} theme={themeData} />
+                <Chat selected={tc.selected} />
+              </div>
+            )}
           </div>
         )}
       </div>

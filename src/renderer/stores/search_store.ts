@@ -1,59 +1,76 @@
 import { action, computed, makeObservable, observable } from "mobx";
+import { ThemeProvider } from "styled-components";
+import { Message } from "./tc_store";
 
 type HandleCharConfig = {
   index: number;
   value: string;
 };
+export type Results = {
+  index: number;
+  users: string[];
+};
 export class SearchStore {
   msg: string = "";
   query: string = "";
-  index: number | null = null;
+  startIndex: number | null = null;
+
+  snapshot: Message[] | null = null;
+
+  results: Results = {
+    users: [],
+    index: 0,
+  };
+
   constructor() {
     makeObservable(this, {
       query: observable,
       msg: observable,
-      index: observable,
+      startIndex: observable,
+      snapshot: observable,
+      results: observable,
       handleChange: action,
       handleKey: action,
-      reset: action,
       searchMode: computed,
+      updateResults: action,
     });
   }
   handleChange({ index, value }: HandleCharConfig) {
     const curr = value[index];
     this.msg = value;
-    const isIndex = this.index !== null;
+    const searchMode = this.searchMode;
     //@ts-ignore
-    if (isIndex && value[this.index] !== "@") {
-      this.index = null;
+    if (searchMode && value[this.startIndex] !== "@") {
+      this.startIndex = null;
       return;
     }
     switch (curr) {
       case " ":
-        if (isIndex) {
-          this.index = null;
+        if (searchMode) {
+          this.startIndex = null;
         }
-        return;
+        break;
       case "@":
-        this.index = index;
+        if (!this.searchMode) {
+          this.startIndex = index;
+        }
         this.query = "";
-        return;
+        break;
       default:
-        if (isIndex) {
+        if (searchMode) {
           this.fetchQuery(value);
-          return;
+          break;
         }
         this.reverseLookup(value, index);
     }
   }
   get searchMode(): boolean {
-    return this.index !== null;
+    return this.startIndex !== null;
   }
   fetchQuery(value: string) {
-    if (!this.searchMode) return;
     let query = "";
     //@ts-ignore
-    for (let x = this.index + 1; x < value.length; x++) {
+    for (let x = this.startIndex + 1; x < value.length; x++) {
       const c = value[x];
       if (c !== " ") {
         query += c;
@@ -69,7 +86,7 @@ export class SearchStore {
       const c = value[x];
       switch (c) {
         case "@":
-          this.index = x;
+          this.startIndex = x;
           this.query = query;
           return;
         case " ":
@@ -79,9 +96,42 @@ export class SearchStore {
       }
     }
   }
-  handleKey(key: string) {}
-  reset() {
-    this.index = null;
-    this.msg = "";
+  handleKey(key: string) {
+    switch (key) {
+      case "ArrowUp":
+        // ++this.selected;
+        break;
+      case "ArrowDown":
+      // --this.selected;
+    }
+  }
+  updateResults() {
+    if (!this.snapshot) {
+      console.log("no snapshot");
+      return;
+    }
+    console.log("updating...");
+    const { query } = this;
+    const msgs = this.snapshot;
+    let q = query.toLowerCase();
+    let index = this.results.index;
+
+    const dups = new Map<string, boolean>();
+    const founds = msgs
+      .filter((msg) => {
+        const dn = msg.userData["display-name"]?.toLowerCase() as string;
+        if (!dups.has(dn) && dn.startsWith(q)) {
+          dups.set(dn, true);
+          return msg;
+        }
+      })
+      .map((user) => user.userData["display-name"] as string);
+    console.log(founds);
+    const sel = founds[index];
+    if (!sel) {
+      index = 0;
+    }
+    this.results.index = index;
+    this.results.users = founds;
   }
 }

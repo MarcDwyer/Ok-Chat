@@ -48,6 +48,10 @@
   .found {
     padding: 5px 5px;
   }
+
+  .found-selected {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
 }
 .directmsg {
   background-color: rgba(176, 9, 35, 0.74);

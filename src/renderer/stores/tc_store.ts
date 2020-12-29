@@ -98,7 +98,6 @@ export class TwitchStore {
     channels.forEach((channel, i) => {
       if (this.channelHub.has(channel) || !this.client) return;
       const c = new Channel({ key: channel, client: this.client, position: i });
-      console.log(this.client);
       c.join();
       this.channelHub.set(channel, c);
       if (i === 0) selected = c;

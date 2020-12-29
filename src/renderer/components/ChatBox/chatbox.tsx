@@ -34,14 +34,11 @@ export const ChatBox = observer(({ selected, ss }: Props) => {
   return (
     <form
       onKeyDown={(e) => {
-        if (ss.searchMode) {
-          ss.handleKey(e.key);
-          return;
-        }
+        if (ss.searchMode) return;
         switch (e.key) {
           case "Enter":
             selected.send(ss.msg);
-            ss.reset();
+            ss.msg = "";
             e.preventDefault();
         }
       }}
