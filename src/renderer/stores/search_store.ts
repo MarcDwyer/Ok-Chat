@@ -1,4 +1,5 @@
 import { action, computed, makeObservable, observable } from "mobx";
+import { removeQuery } from "../util";
 import { Message } from "./tc_store";
 
 type HandleCharConfig = {
@@ -21,6 +22,8 @@ export class SearchStore {
     index: 0,
   };
 
+  private initState: SearchStore;
+
   constructor() {
     makeObservable(this, {
       query: observable,
@@ -32,21 +35,27 @@ export class SearchStore {
       handleKey: action,
       searchMode: computed,
       updateResults: action,
+      reset: action,
+      completeQuery: action,
     });
+    this.initState = { ...this };
   }
   handleChange({ index, value }: HandleCharConfig) {
     const curr = value[index];
     this.msg = value;
     const searchMode = this.searchMode;
-    //@ts-ignore
-    if (searchMode && value[this.startIndex] !== "@") {
-      this.startIndex = null;
+    if (
+      //@ts-ignore
+      (searchMode && value[this.startIndex] !== "@") ||
+      (searchMode && !value.length)
+    ) {
+      this.reset();
       return;
     }
     switch (curr) {
       case " ":
         if (searchMode) {
-          this.startIndex = null;
+          this.reset();
         }
         break;
       case "@":
@@ -79,39 +88,31 @@ export class SearchStore {
     this.query = query;
   }
   reverseLookup(value: string, index: number) {
-    const subStr = value.substr(0, index);
-    let query: string = "";
+    const subStr = value.substr(0, index + 1);
+    const query: string[] = [];
     for (let x = subStr.length - 1; x !== -1; --x) {
       const c = value[x];
       switch (c) {
         case "@":
           this.startIndex = x;
-          this.query = query;
-          return;
+          this.query = query.join("");
+          break;
         case " ":
           return;
         default:
-          query += c;
+          query.unshift(c);
       }
     }
-    console.log(query);
   }
   handleKey(key: string) {
-    console.log(key);
     const { users, index } = this.results;
-    const { msg, startIndex } = this;
     let next = index;
     switch (key) {
       case "Tab":
       case "Enter":
-        console.log(startIndex);
-        if (!this.searchMode) return;
+        console.log("submitting");
         const channel = users[index];
-        console.log(channel);
-        //@ts-ignore
-        let i = startIndex + 1;
-        this.msg = msg.slice(0, i) + channel + msg.slice(i, msg.length);
-        this.startIndex = null;
+        this.completeQuery(channel);
         break;
       case "ArrowUp":
         ++next;
@@ -123,6 +124,20 @@ export class SearchStore {
       next = 0;
     }
     this.results.index = next;
+  }
+  completeQuery(channel: string) {
+    const { msg, startIndex, query } = this;
+    if (startIndex === null) return;
+    console.log("running...");
+    //@ts-ignore
+    const index = startIndex + 1;
+    const first = msg.slice(0, index);
+    let last = msg.slice(index + 1, msg.length);
+    console.log({ first, last });
+    last = removeQuery(last, query.length);
+
+    this.msg = first + channel + last;
+    this.reset();
   }
   updateResults(channel: string) {
     if (!this.snapshot) {
@@ -148,7 +163,17 @@ export class SearchStore {
     if (!founds[index]) {
       this.results.index = 0;
     }
-    console.log(query);
     this.results.users = founds;
+  }
+  reset() {
+    for (const [k, v] of Object.entries(this.initState)) {
+      enum Not {
+        msg,
+      }
+      if (k in this && typeof v !== "function" && !(k in Not)) {
+        //@ts-ignore
+        this[k] = v;
+      }
+    }
   }
 }

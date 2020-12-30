@@ -67,3 +67,11 @@ export function getMsgStyle(m: Message) {
   }
   return result;
 }
+
+export const removeQuery = (piece: string, len: number) => {
+  let a: string[] = piece.split("");
+
+  a.splice(0, len);
+
+  return a.join("");
+};

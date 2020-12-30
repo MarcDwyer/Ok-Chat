@@ -7,8 +7,14 @@
 ☐ Impl BTTVs emotes and Twitch's
 ✔ Fix chat not re-rendering on undefined @done(20-12-23 00:22)
 ✔ Replace index keys of elements for nano id keys @done(20-12-23 00:22)
-☐ Impl @ to autofill users in the chat (to directmsg) @started(20-12-23 01:26)
+✔ Impl @ to autofill users in the chat (to directmsg) @started(20-12-23 01:26) @done(20-12-29 21:35) @lasted(6d20h9m26s)
     Seems that twitch & twitter do a loop over and reverse loop of a word in a string
     to detect if user is attempting to make a user find query.
 ✔ Fix duplicate find user results in ChatBox's FindUser component @started(20-12-23 23:25) @done(20-12-24 19:29) @lasted(20h4m43s)
 ☐ Input should resize itself depending on the amount of characters within it
+
+
+
+☐ Stabalize and lessen abstraction of search prediction feature @started(20-12-29 19:25)
+    ☐ Clean up CSS for search results
+    ☐ Lessen abstraction
