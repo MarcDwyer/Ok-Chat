@@ -52,7 +52,7 @@
     }
   },
   "build": {
-    "productName": "ProductName",
+    "productName": "Ok-Chat",
     "appId": "org.your.productname",
     "mac": {
       "category": "your.app.category.type"
@@ -71,10 +71,6 @@
     "win": {
       "target": "nsis"
     }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com:Robinfr/electron-react-typescript.git"
   },
   "author": {
     "name": "Marc Dwyer",

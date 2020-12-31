@@ -25,6 +25,8 @@ export class SearchStore {
   private initState: SearchStore;
 
   constructor() {
+    this.initState = { ...this };
+
     makeObservable(this, {
       query: observable,
       msg: observable,
@@ -38,12 +40,12 @@ export class SearchStore {
       reset: action,
       completeQuery: action,
     });
-    this.initState = { ...this };
   }
   handleChange({ index, value }: HandleCharConfig) {
     const curr = value[index];
     this.msg = value;
     const searchMode = this.searchMode;
+    console.log();
     if (
       //@ts-ignore
       (searchMode && value[this.startIndex] !== "@") ||
@@ -136,7 +138,7 @@ export class SearchStore {
     console.log({ first, last });
     last = removeQuery(last, query.length);
 
-    this.msg = first + channel + last;
+    this.msg = first + channel + " " + last;
     this.reset();
   }
   updateResults(channel: string) {
@@ -166,10 +168,11 @@ export class SearchStore {
     this.results.users = founds;
   }
   reset() {
+    enum Not {
+      msg,
+      initState,
+    }
     for (const [k, v] of Object.entries(this.initState)) {
-      enum Not {
-        msg,
-      }
       if (k in this && typeof v !== "function" && !(k in Not)) {
         //@ts-ignore
         this[k] = v;
