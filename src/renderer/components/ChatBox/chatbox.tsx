@@ -47,9 +47,10 @@ export const ChatBox = observer(({ selected, ss }: Props) => {
         }
         switch (e.key) {
           case "Enter":
-            selected.send(ss.msg);
-            ss.msg = "";
             e.preventDefault();
+            selected.send(ss.msg);
+            ss.reset();
+            ss.msg = "";
         }
       }}
     >

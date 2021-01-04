@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import React, { useRef, useCallback, useEffect } from "react";
-import { TwitchStore } from "../../stores/tc_store";
 import { ChatBox } from "../ChatBox/chatbox";
 import styled from "styled-components";
 

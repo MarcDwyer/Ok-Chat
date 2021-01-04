@@ -8,7 +8,7 @@ import { UserInfo, UserInfoStore } from "../../stores/user_info_store";
 import Login from "../Login/login";
 import { EnterUser } from "../EnterUsername/enter_user";
 import { Followers } from "../Followed/followers";
-import { ChannelTabs } from "../ChannelTabs/channel_tabs";
+import ChannelTabs from "../ChannelTabs/channel_tabs";
 import Chat from "../Chat/chat";
 
 import "./main.scss";

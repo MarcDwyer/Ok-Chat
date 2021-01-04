@@ -64,18 +64,15 @@ export class Channel {
     const limit = 250;
     let msgs = [...this.messages];
     if (msgs.length > limit) {
-      console.log("limit hit");
       msgs.length = limit - 25;
     }
     this.liveMsg = [m, ...msgs];
   }
   initPause() {
-    console.log("init pause");
     this.pause = true;
     this.snapshotMsg = [...this.liveMsg];
   }
   endPause() {
-    console.log("ending p");
     this.snapshotMsg = [];
     this.pause = false;
   }

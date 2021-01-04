@@ -4,7 +4,7 @@ import { Channel } from "./channel";
 import { ChatUserstate, Client } from "tmi.js";
 import { nanoid } from "nanoid";
 
-type ChannelHub = Map<string, Channel>;
+export type ChannelHub = Map<string, Channel>;
 
 export type Message = {
   userData: ChatUserstate;
@@ -13,7 +13,11 @@ export type Message = {
   id: string;
   isDirect?: boolean;
 };
-
+type DecBeforeParams = {
+  from: number;
+  to: number;
+  chan: Channel;
+};
 export class TwitchStore {
   client: Client | null = null;
 
@@ -27,7 +31,8 @@ export class TwitchStore {
       selected: observable,
       joinChannel: action,
       partChannel: action,
-      decPosition: action,
+      decBeforePosition: action,
+      incAfterPosition: action,
       setNewSelected: action,
       joinTabs: action,
       tabs: computed,
@@ -58,14 +63,30 @@ export class TwitchStore {
     this.setTabsLS();
   }
   decPosition(start: number) {
-    let notIt = 0;
     for (const chan of this.channelHub.values()) {
-      if (notIt === start) {
+      if (chan.position > start) {
         --chan.position;
-      } else {
-        ++notIt;
       }
     }
+  }
+  decBeforePosition({ from, to, chan }: DecBeforeParams) {
+    for (const chan of this.channelHub.values()) {
+      const { position } = chan;
+      if (position <= to && position > from) {
+        --chan.position;
+      }
+    }
+    chan.position = to;
+    this.setTabsLS();
+  }
+  incAfterPosition(start: number, chan: Channel) {
+    for (const chan of this.channelHub.values()) {
+      if (chan.position >= start) {
+        ++chan.position;
+      }
+    }
+    chan.position = start;
+    this.setTabsLS();
   }
   setNewSelected(index: number) {
     const tabs = this.tabs;
@@ -130,7 +151,7 @@ export class TwitchStore {
           message,
           self,
           isDirect,
-          id: nanoid(),
+          id: nanoid(5),
         };
         c.handleMsg(m);
       }
