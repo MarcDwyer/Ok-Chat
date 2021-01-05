@@ -1,6 +1,7 @@
 export const TwitchEndpoints = {
   follows: "https://api.twitch.tv/kraken/streams/followed",
-  stream: "https://api.twitch.tv/kraken/streams/",
+  stream: "https://api.twitch.tv/kraken/channel/",
+  search: "https://api.twitch.tv/kraken/search/channels?query=",
 };
 
 export class TwitchApi {
@@ -8,7 +9,7 @@ export class TwitchApi {
 
   constructor(public token: string, public username: string) {}
 
-  async fetch<T>(url: string): Promise<T | null> {
+  async fetch<T>(url: string): Promise<T> {
     const { token, clientId } = this;
 
     const auth = "OAuth " + token;
@@ -22,10 +23,11 @@ export class TwitchApi {
         },
       });
       const data = await fetchThis.json();
+      if ("error" in data) throw data;
       return data;
     } catch (err) {
       console.log(`Error: ${err}`);
-      return null;
+      return err;
     }
   }
 }

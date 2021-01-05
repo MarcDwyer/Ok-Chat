@@ -1,10 +1,11 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, autorun, computed, makeObservable, observable } from "mobx";
 import { nanoid } from "nanoid";
 import { Client } from "tmi.js";
-import { TwitchApi } from "../../twitch_api";
+import { TwitchApi, TwitchEndpoints } from "../../twitch_api";
+import { SearchChannel, ChannelData } from "../twitch_types/twitch_api_types";
 import { Message } from "./tc_store";
 
-type ChannelData = {
+type ChannelConfig = {
   position: number;
   client: Client;
   key: string;
@@ -22,14 +23,15 @@ export class Channel {
   joined: boolean = false;
   error: string | null = null;
 
-  private client: Client;
-  private api: TwitchApi;
+  data: ChannelData | null = null;
 
-  constructor({ client, position, key, api }: ChannelData) {
+  private client: Client;
+
+  constructor({ client, position, key, api }: ChannelConfig) {
     this.client = client;
     this.position = position;
     this.key = key;
-    this.api = api;
+
     makeObservable(this, {
       pause: observable,
       messages: computed,
@@ -43,9 +45,19 @@ export class Channel {
       initPause: action,
       endPause: action,
     });
+
+    autorun(() => {
+      const endpoint = TwitchEndpoints.search + this.channelName + "&limit=1";
+      api.fetch<SearchChannel>(endpoint).then((data) => {
+        if (data.channels.length) {
+          const cData = data.channels[0];
+          console.log(cData);
+          this.data = cData;
+        }
+      });
+    });
   }
   async join() {
-    console.log(`Joining ${this.key}`);
     try {
       await this.client.join(this.key);
       this.error = null;

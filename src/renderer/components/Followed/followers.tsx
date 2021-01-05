@@ -31,6 +31,10 @@ export const Followers = observer(({ streamStore, themeStore, tc }: Props) => {
           if (name.length > limit) {
             name = name.substr(0, limit) + "...";
           }
+          let game =
+            follower.game.length > limit
+              ? follower.game.substring(0, limit) + "..."
+              : follower.game;
           return (
             <StreamCard
               key={i}
@@ -42,7 +46,7 @@ export const Followers = observer(({ streamStore, themeStore, tc }: Props) => {
               <img src={follower.channel.logo} alt="streamer" />
               <div className="details">
                 <span className="name">{name}</span>
-                <span className="playing">{follower.game}</span>
+                <span className="playing">{game}</span>
               </div>
               <div className="viewer-count">
                 <FaDotCircle />

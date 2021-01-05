@@ -36,7 +36,6 @@ export class TwitchStore {
       decPosition: action,
       decBeforePosition: action,
       incAfterPosition: action,
-      setNewSelected: action,
       joinTabs: action,
       tabs: computed,
       connect: action,
@@ -46,6 +45,21 @@ export class TwitchStore {
       () => this.tabs,
       (tabs) => setLS("channels", JSON.stringify(tabs))
     );
+    reaction(
+      () => this.selected,
+      (sel, prevSel) => this.handleSelected(sel, prevSel)
+    );
+  }
+  handleSelected(curr: Channel | null, prev: Channel | null) {
+    const tabs = this.tabs;
+    if (!curr && prev && tabs.length) {
+      const index = prev.position;
+      const sel = tabs[index] || tabs[index + 1] || tabs[index - 1];
+      const chan = this.channelHub.get(sel);
+      if (chan) {
+        this.selected = chan;
+      }
+    }
   }
   joinChannel(chanName: string) {
     if (!this.client) throw new Error("No client conn has been established");
@@ -66,13 +80,10 @@ export class TwitchStore {
     this.selected = c || null;
   }
   partChannel(channel: Channel) {
-    const isSel = this.selected === channel;
+    if (channel === this.selected) this.selected = null;
     channel.part();
     this.channelHub.delete(channel.key);
     this.decPosition(channel.position);
-    if (isSel) {
-      this.setNewSelected(channel.position);
-    }
   }
   decPosition(start: number) {
     for (const chan of this.channelHub.values()) {
@@ -97,18 +108,6 @@ export class TwitchStore {
       }
     }
     chan.position = start;
-  }
-  setNewSelected(index: number) {
-    const tabs = this.tabs;
-    if (tabs.length === 0) {
-      this.selected = null;
-      return;
-    }
-    const sel = tabs[index] || tabs[index + 1] || tabs[index - 1];
-    if (sel) {
-      const channel = this.channelHub.get(sel);
-      if (channel) this.selected = channel;
-    }
   }
   get tabs() {
     const result: string[] = new Array(this.channelHub.size);
