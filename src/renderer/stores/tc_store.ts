@@ -1,8 +1,9 @@
-import { action, computed, makeObservable, observable } from "mobx";
-import { UserInfo } from "./user_info_store";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { Channel } from "./channel";
 import { ChatUserstate, Client } from "tmi.js";
 import { nanoid } from "nanoid";
+import { TwitchApi } from "../../twitch_api";
+import { setLS } from "../util";
 
 export type ChannelHub = Map<string, Channel>;
 
@@ -19,6 +20,7 @@ type DecBeforeParams = {
   chan: Channel;
 };
 export class TwitchStore {
+  private api: TwitchApi | null = null;
   client: Client | null = null;
 
   channelHub: ChannelHub = new Map();
@@ -31,6 +33,7 @@ export class TwitchStore {
       selected: observable,
       joinChannel: action,
       partChannel: action,
+      decPosition: action,
       decBeforePosition: action,
       incAfterPosition: action,
       setNewSelected: action,
@@ -38,19 +41,29 @@ export class TwitchStore {
       tabs: computed,
       connect: action,
     });
+
+    reaction(
+      () => this.tabs,
+      (tabs) => setLS("channels", JSON.stringify(tabs))
+    );
   }
   joinChannel(chanName: string) {
     if (!this.client) throw new Error("No client conn has been established");
     chanName = "#" + chanName.toLowerCase();
     let c = this.channelHub.get(chanName);
-    if (!c) {
+    if (!c && this.api) {
       const position = this.channelHub.size;
-      c = new Channel({ key: chanName, position, client: this.client });
+      c = new Channel({
+        key: chanName,
+        position,
+        client: this.client,
+        api: this.api,
+      });
       this.channelHub.set(chanName, c);
-      this.setTabsLS();
     }
-    if (!c.joined) c.join();
-    this.selected = c;
+    //@ts-ignore
+    if (c && !c.joined) c.join();
+    this.selected = c || null;
   }
   partChannel(channel: Channel) {
     const isSel = this.selected === channel;
@@ -60,7 +73,6 @@ export class TwitchStore {
     if (isSel) {
       this.setNewSelected(channel.position);
     }
-    this.setTabsLS();
   }
   decPosition(start: number) {
     for (const chan of this.channelHub.values()) {
@@ -77,7 +89,6 @@ export class TwitchStore {
       }
     }
     chan.position = to;
-    this.setTabsLS();
   }
   incAfterPosition(start: number, chan: Channel) {
     for (const chan of this.channelHub.values()) {
@@ -86,7 +97,6 @@ export class TwitchStore {
       }
     }
     chan.position = start;
-    this.setTabsLS();
   }
   setNewSelected(index: number) {
     const tabs = this.tabs;
@@ -99,9 +109,6 @@ export class TwitchStore {
       const channel = this.channelHub.get(sel);
       if (channel) this.selected = channel;
     }
-  }
-  setTabsLS() {
-    localStorage.setItem("channels", JSON.stringify(this.tabs));
   }
   get tabs() {
     const result: string[] = new Array(this.channelHub.size);
@@ -117,8 +124,13 @@ export class TwitchStore {
     const channels: string[] = JSON.parse(ls);
     let selected: Channel | null = null;
     channels.forEach((channel, i) => {
-      if (this.channelHub.has(channel) || !this.client) return;
-      const c = new Channel({ key: channel, client: this.client, position: i });
+      if (this.channelHub.has(channel) || !this.client || !this.api) return;
+      const c = new Channel({
+        key: channel,
+        client: this.client,
+        position: i,
+        api: this.api,
+      });
       c.join();
       this.channelHub.set(channel, c);
       if (i === 0) selected = c;
@@ -126,18 +138,19 @@ export class TwitchStore {
     this.selected = selected;
   }
 
-  connect({ username, token }: UserInfo) {
+  connect(api: TwitchApi) {
+    this.api = api;
     const client = Client({
       connection: {
         reconnect: true,
         secure: true,
       },
       identity: {
-        username,
-        password: `oauth:${token}`,
+        username: api.username,
+        password: `oauth:${api.token}`,
       },
     });
-    client.connect();
+    client.connect().catch((e) => console.error(e));
     client.on("connected", () => {
       this.client = client;
       this.joinTabs();
@@ -145,7 +158,7 @@ export class TwitchStore {
     client.on("message", (channel, tags, message, self) => {
       const c = this.channelHub.get(channel);
       if (c) {
-        const isDirect = message.toLowerCase().includes(username);
+        const isDirect = message.toLowerCase().includes(api.username);
         const m: Message = {
           userData: tags,
           message,

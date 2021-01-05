@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import styled from "styled-components";
 import { TwitchStore } from "../../stores/tc_store";
 import { ThemeData } from "../../stores/theme_store";
 import { AiOutlineClose } from "react-icons/ai";
-import { ChannelHub } from "../../stores/tc_store";
 
 import "./channel_tabs.scss";
 import { action, computed, makeObservable, observable } from "mobx";
@@ -92,16 +91,9 @@ const ChannelTabs = observer(({ tc, theme, tabState }: ExtProps) => {
   useEffect(() => {
     tabState.reset();
   }, [selected]);
+
   return (
-    <div
-      className="main-tab"
-      //   onMouseUp={() => {
-      //     if (tabState.isChanging) {
-      //       console.log("Do something here");
-      //       tabState.finalize();
-      //     }
-      //   }}
-    >
+    <div className="main-tab">
       {tabs.length !== 0 &&
         tabs.map((tab) => {
           const c = tc.channelHub.get(tab);

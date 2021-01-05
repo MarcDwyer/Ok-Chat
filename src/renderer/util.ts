@@ -75,3 +75,7 @@ export const removeQuery = (piece: string, len: number) => {
 
   return a.join("");
 };
+
+export function setLS(key: string, data: string) {
+  localStorage.setItem(key, data);
+}

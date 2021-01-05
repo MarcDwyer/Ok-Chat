@@ -1,9 +1,9 @@
 import { ipcRenderer } from "electron";
 import { observer } from "mobx-react-lite";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { TwitchStore } from "../../stores/tc_store";
 import { ThemeStore } from "../../stores/theme_store";
-import { UserInfo, UserInfoStore } from "../../stores/user_info_store";
+import { UserInfoStore } from "../../stores/user_info_store";
 
 import Login from "../Login/login";
 import { EnterUser } from "../EnterUsername/enter_user";
@@ -13,6 +13,7 @@ import Chat from "../Chat/chat";
 
 import "./main.scss";
 import { StreamStore } from "../../stores/streams_store";
+import { TwitchApi } from "../../../twitch_api";
 
 type TokenPayload = {
   token?: string;
@@ -31,9 +32,9 @@ export const Main = observer(
 
     useEffect(() => {
       if (username && token) {
-        const info: UserInfo = { username, token };
-        streamStore.init(info);
-        tc.connect(info);
+        const api = new TwitchApi(token, username);
+        streamStore.init(api);
+        tc.connect(api);
       }
     }, [username, token]);
 

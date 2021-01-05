@@ -75,7 +75,7 @@ app.on("activate", () => {
     createWindow();
   }
 });
-const clientID = "9uxd71rlrkw0ua39rlkebyf4rskzw6";
+const clientID = "d30da4qze1heg6lr149qu7et2t4aof";
 const redirect = "https://localhost/";
 
 function handleAuthApp(url: string, signal: Deferred<string>) {

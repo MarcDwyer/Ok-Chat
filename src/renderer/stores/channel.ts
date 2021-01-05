@@ -1,16 +1,17 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import { nanoid } from "nanoid";
 import { Client } from "tmi.js";
+import { TwitchApi } from "../../twitch_api";
 import { Message } from "./tc_store";
 
 type ChannelData = {
   position: number;
   client: Client;
   key: string;
+  api: TwitchApi;
 };
 export class Channel {
-  id: string = nanoid(10);
-  limit = 10;
+  id: string = nanoid(5);
   pause: boolean = false;
   snapshotMsg: Message[] = [];
 
@@ -22,11 +23,13 @@ export class Channel {
   error: string | null = null;
 
   private client: Client;
+  private api: TwitchApi;
 
-  constructor({ client, position, key }: ChannelData) {
+  constructor({ client, position, key, api }: ChannelData) {
     this.client = client;
     this.position = position;
     this.key = key;
+    this.api = api;
     makeObservable(this, {
       pause: observable,
       messages: computed,
@@ -41,7 +44,6 @@ export class Channel {
       endPause: action,
     });
   }
-
   async join() {
     console.log(`Joining ${this.key}`);
     try {
