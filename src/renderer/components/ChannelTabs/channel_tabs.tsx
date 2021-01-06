@@ -107,7 +107,6 @@ const ChannelTabs = observer(({ tc, theme, tabState }: ExtProps) => {
             <Tab
               onDragOver={() => {
                 let to: Channel | null = null;
-                console.log(`Hovering: ${tab}`);
                 if (tabState.isChanging) {
                   if (c !== tabState.from) to = c;
                   tabState.to = to;

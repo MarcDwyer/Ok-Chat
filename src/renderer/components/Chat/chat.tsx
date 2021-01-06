@@ -57,6 +57,34 @@ export const Chat = observer(({ selected, ss }: Props) => {
       ss.updateResults(selected.channelName);
     }
   }, [selected.channelName, ss.query, ss.searchMode, ss.snapshot]);
+
+  const parseMsg = (msg: string) => {
+    return (
+      <span className="actual-msg">
+        {(() => {
+          if (!selected.emotes) return msg;
+          const words = msg.split(" ");
+          const result: JSX.Element[] = [];
+          let key = 0;
+          for (const word of words) {
+            const emote = selected.emotes.get(word);
+            if (emote) {
+              result.push(<img key={key} src={emote.images["1x"]} />);
+              continue;
+            } else {
+              result.push(
+                <span key={key} className="word">
+                  {word}{" "}
+                </span>
+              );
+            }
+            ++key;
+          }
+          return result;
+        })()}
+      </span>
+    );
+  };
   return (
     <>
       {!selected && <div>Try joining a channel...</div>}
@@ -82,7 +110,7 @@ export const Chat = observer(({ selected, ss }: Props) => {
                       >
                         {msg.userData["display-name"]}:
                       </span>
-                      <span className="actual-msg">{msg.message}</span>
+                      {parseMsg(msg.message)}
                     </div>
                   );
                 })}

@@ -7,6 +7,7 @@
 ☐ Impl BTTVs emotes and Twitch's
     https://api.betterttv.net/3/cached/frankerfacez/users/twitch/${id}
     Need channelID in order to fetch bttv emote data
+    BTTV parses messages and replaces emotes with img elements with src being cdn to emote images
 ✔ Fix chat not re-rendering on undefined @done(20-12-23 00:22)
 ✔ Replace index keys of elements for nano id keys @done(20-12-23 00:22)
 ✔ Impl @ to autofill users in the chat (to directmsg) @started(20-12-23 01:26) @done(20-12-29 21:35) @lasted(6d20h9m26s)
