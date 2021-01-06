@@ -60,7 +60,7 @@ export const Chat = observer(({ selected, ss }: Props) => {
 
   const parseMsg = (msg: string) => {
     return (
-      <span className="actual-msg">
+      <div className="actual-msg">
         {(() => {
           if (!selected.emotes) return msg;
           const words = msg.split(" ");
@@ -70,7 +70,6 @@ export const Chat = observer(({ selected, ss }: Props) => {
             const emote = selected.emotes.get(word);
             if (emote) {
               result.push(<img key={key} src={emote.images["1x"]} />);
-              continue;
             } else {
               result.push(
                 <span key={key} className="word">
@@ -82,7 +81,7 @@ export const Chat = observer(({ selected, ss }: Props) => {
           }
           return result;
         })()}
-      </span>
+      </div>
     );
   };
   return (

@@ -45,7 +45,6 @@ export class SearchStore {
     const curr = value[index];
     this.msg = value;
     const searchMode = this.searchMode;
-    console.log();
     if (
       //@ts-ignore
       (searchMode && value[this.startIndex] !== "@") ||

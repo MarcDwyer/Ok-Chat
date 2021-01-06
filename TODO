@@ -4,7 +4,7 @@
 ☐ Add button to hide follower bar
 ☐ Impl twitch's irc events to channels
 ☐ Add ability to click on individual users to display more info
-☐ Impl BTTVs emotes and Twitch's
+✔ Impl BTTVs emotes and Twitch's @started(21-01-06 14:41) @done(21-01-06 14:41) @lasted(40s)
     https://api.betterttv.net/3/cached/frankerfacez/users/twitch/${id}
     Need channelID in order to fetch bttv emote data
     BTTV parses messages and replaces emotes with img elements with src being cdn to emote images
@@ -20,7 +20,10 @@
     ☐ Clean up CSS for search results
     ☐ Lessen abstraction
 ☐ Add logout button
-    
+
+
+☐ Style messages better, BTTV emotes should be centered
+
 ✔ Create Tabs switch mechanism @done(21-01-04 01:26)
    from > to 
    inc everything after toPos
