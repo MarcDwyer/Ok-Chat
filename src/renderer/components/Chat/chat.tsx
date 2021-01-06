@@ -8,6 +8,7 @@ import { getMsgStyle } from "../../util";
 import { SearchStore } from "../../stores/search_store";
 import { FindUser } from "./find_user";
 import { Channel } from "../../stores/channel";
+import { Emote } from "../../bttv_types/bttv";
 
 type Props = {
   ss: SearchStore;
@@ -65,20 +66,19 @@ export const Chat = observer(({ selected, ss }: Props) => {
           if (!selected.emotes) return msg;
           const words = msg.split(" ");
           const result: JSX.Element[] = [];
-          let key = 0;
-          for (const word of words) {
+          words.forEach((word, i) => {
+            //@ts-ignore
             const emote = selected.emotes.get(word);
             if (emote) {
-              result.push(<img key={key} src={emote.images["1x"]} />);
+              result.push(<img key={i} src={emote.images["1x"]} />);
             } else {
               result.push(
-                <span key={key} className="word">
+                <span key={i} className="word">
                   {word}{" "}
                 </span>
               );
             }
-            ++key;
-          }
+          });
           return result;
         })()}
       </div>
