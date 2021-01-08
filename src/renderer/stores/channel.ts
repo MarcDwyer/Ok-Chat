@@ -1,17 +1,17 @@
-import { action, autorun, computed, makeObservable, observable, reaction } from "mobx";
+import { action, autorun, computed, makeObservable, observable } from "mobx";
 import { nanoid } from "nanoid";
 import { Client } from "tmi.js";
 import { TwitchApi, TwitchEndpoints } from "../../twitch_api";
+import { EmoteMap } from "../emotes/emotes";
 import { SearchChannel, ChannelData } from "../twitch_types/twitch_api_types";
 import { Message } from "./tc_store";
-import { BTTV, Emote } from "../bttv_types/bttv";
-
 
 type ChannelConfig = {
   position: number;
   client: Client;
   key: string;
   api: TwitchApi;
+  emotes: EmoteMap | null;
 };
 export class Channel {
   id: string = nanoid(5);
@@ -26,14 +26,21 @@ export class Channel {
   error: string | null = null;
 
   data: ChannelData | null = null;
-  emotes: Map<string, Emote> | null = null;
+
+  emotes: EmoteMap | null;
 
   private client: Client;
 
-  constructor({ client, position, key, api }: ChannelConfig) {
+  constructor({ client, position, key, api, emotes }: ChannelConfig) {
     this.client = client;
     this.position = position;
     this.key = key;
+    let emo: null | EmoteMap = emotes;
+    if (emotes) {
+      //@ts-ignore
+      emo = new Map(emotes);
+    }
+    this.emotes = emo;
 
     makeObservable(this, {
       pause: observable,
@@ -59,18 +66,21 @@ export class Channel {
         }
       });
     });
-    reaction(() => this.data, async (data) => {
-      if (data) {
-        BTTV.getEmotes(data._id).then(emotes => { 
-        const result = new Map<string, Emote>()   
-        for (const emote of emotes) {
-          result.set(emote.code, emote);
-        }        
-        console.log(result)
-        this.emotes = result;
-        }).catch(e => {})
-      }
-    })
+    // reaction(
+    //   () => this.data,
+    //   async (data) => {
+    //     if (data) {
+    //       EmoteApi.getFrankerEmotes(data._id).then((emotes) => {
+    //         const result = new Map<string, Emote>();
+    //         for (const emote of emotes) {
+    //           result.set(emote.code, emote);
+    //         }
+    //         console.log(result);
+    //         this.emotes = result;
+    //       });
+    //     }
+    //   }
+    // );
   }
   async join() {
     try {
@@ -87,7 +97,7 @@ export class Channel {
   }
 
   send(msg: string) {
-    this.client.say(this.key, msg).catch(e => console.error(e));
+    this.client.say(this.key, msg).catch((e) => console.error(e));
   }
   handleMsg(m: Message) {
     const limit = 250;
@@ -95,7 +105,7 @@ export class Channel {
     if (msgs.length > limit) {
       msgs.length = limit - 25;
     }
-   
+
     this.liveMsg = [m, ...msgs];
   }
   initPause() {
@@ -104,7 +114,7 @@ export class Channel {
   }
   endPause() {
     this.snapshotMsg = [];
-    this.pause = false
+    this.pause = false;
   }
   get messages(): Message[] {
     return this.pause ? this.snapshotMsg : this.liveMsg;

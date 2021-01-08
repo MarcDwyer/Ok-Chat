@@ -23,6 +23,7 @@ const createWindow = async () => {
     height: 720,
     webPreferences: {
       nodeIntegration: true,
+      webSecurity: false,
     },
     title,
   });

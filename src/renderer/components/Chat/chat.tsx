@@ -8,7 +8,6 @@ import { getMsgStyle } from "../../util";
 import { SearchStore } from "../../stores/search_store";
 import { FindUser } from "./find_user";
 import { Channel } from "../../stores/channel";
-import { Emote } from "../../bttv_types/bttv";
 
 type Props = {
   ss: SearchStore;
@@ -70,7 +69,7 @@ export const Chat = observer(({ selected, ss }: Props) => {
             //@ts-ignore
             const emote = selected.emotes.get(word);
             if (emote) {
-              result.push(<img key={i} src={emote.images["1x"]} />);
+              result.push(<img key={i} src={emote.url} />);
             } else {
               result.push(
                 <span key={i} className="word">

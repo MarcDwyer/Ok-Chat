@@ -1,9 +1,17 @@
-import { action, computed, makeObservable, observable, reaction } from "mobx";
+import {
+  action,
+  autorun,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+} from "mobx";
 import { Channel } from "./channel";
 import { ChatUserstate, Client } from "tmi.js";
 import { nanoid } from "nanoid";
 import { TwitchApi } from "../../twitch_api";
 import { setLS } from "../util";
+import { EmoteApi, EmoteMap } from "../emotes/emotes";
 
 export type ChannelHub = Map<string, Channel>;
 
@@ -19,18 +27,22 @@ type DecBeforeParams = {
   to: number;
   chan: Channel;
 };
+
 export class TwitchStore {
-  private api: TwitchApi | null = null;
+  api: TwitchApi | null = null;
   client: Client | null = null;
 
   channelHub: ChannelHub = new Map();
 
   selected: Channel | null = null;
 
+  emotes: null | EmoteMap = null;
+
   constructor() {
     makeObservable(this, {
       channelHub: observable,
       selected: observable,
+      api: observable,
       joinChannel: action,
       partChannel: action,
       decPosition: action,
@@ -41,6 +53,20 @@ export class TwitchStore {
       connect: action,
     });
 
+    reaction(
+      () => this.api,
+      (api) => {
+        if (api) {
+          console.log("running...");
+          EmoteApi.getTwitchEmotes(api)
+            .then((emotes) => {
+              console.log(emotes);
+              this.emotes = emotes;
+            })
+            .catch((e) => console.error(e));
+        }
+      }
+    );
     reaction(
       () => this.tabs,
       (tabs) => setLS("channels", JSON.stringify(tabs))
@@ -72,6 +98,7 @@ export class TwitchStore {
         position,
         client: this.client,
         api: this.api,
+        emotes: this.emotes,
       });
       this.channelHub.set(chanName, c);
     }
@@ -129,6 +156,7 @@ export class TwitchStore {
         client: this.client,
         position: i,
         api: this.api,
+        emotes: this.emotes,
       });
       c.join();
       this.channelHub.set(channel, c);
