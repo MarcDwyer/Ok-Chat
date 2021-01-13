@@ -9,7 +9,7 @@ export class StreamStore {
   followers: StreamData[] | null = null;
   error: string | null = null;
 
-  private refresh: number | null = null;
+  private refresh: NodeJS.Timeout | null = null;
   private api: TwitchApi | null = null;
 
   constructor() {

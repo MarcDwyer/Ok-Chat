@@ -22,20 +22,33 @@ type TabProps = {
   shadeTwo: string;
   isError: boolean;
   name: string;
+  isHover: boolean;
 };
 const Tab = styled.div<TabProps>`
   flex: 0 0 125px;
   height: 100%;
   background-color: ${(p) => {
-    if (!p.isError) {
-      return p.isSel ? p.shadeTwo : p.shadeOne;
+    if (p.isHover) {
+      return p.shadeTwo
     }
-    return `rgba(176,9,35, ${p.isSel ? ".55" : ".3"})`;
+    return p.shadeOne;
   }};
   display: flex;
   cursor: pointer;
   border-left: 0.5px solid black;
   border-right: 0.5px solid black;
+  border-bottom: 0.5px solid
+    ${(p) => {
+      let color: string = "black";
+      if (p.isSel) {
+        color = "blue";
+      }
+      if (p.isError) {
+        color = "red";
+      }
+      console.log(color);
+      return color;
+    }};
 
   span {
     margin: auto;
@@ -103,8 +116,10 @@ const ChannelTabs = observer(({ tc, theme, tabState }: ExtProps) => {
           const charLimit = 8;
           const name = tab.length > charLimit ? tab.substr(0, 8) + "..." : tab;
           const isSel = selected === c;
+          const isHover = tabState.to === c;
           return (
             <Tab
+              isHover={isHover}
               onDragOver={() => {
                 let to: Channel | null = null;
                 if (tabState.isChanging) {
