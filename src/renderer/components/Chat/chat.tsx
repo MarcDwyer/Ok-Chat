@@ -62,7 +62,7 @@ export const Chat = observer(({ selected, ss }: Props) => {
     return (
       <div className="actual-msg">
         {(() => {
-          if (!selected.emotes) return msg;
+          if (!selected.emotes.size) return msg;
           const words = msg.split(" ");
           const result: JSX.Element[] = [];
           words.forEach((word, i) => {

@@ -1,14 +1,10 @@
 ✔ Channel tabs require ordered state, change to array of strings @done(20-12-21 00:09)
 ✔ Listen to Ctrl+W events to close selected tab @started(20-12-21 00:09) @done(20-12-21 00:09) @lasted(59s)
 ✔ Pause the chat when scrolling, when done scrolling resume chat. (UI Chat should not be updated but state should) @started(20-12-22 19:07) @done(20-12-22 22:38) @lasted(3h31m9s)
-☐ Add button to hide follower bar
-☐ Impl twitch's irc events to channels
-☐ Add ability to click on individual users to display more info
 ✔ Impl BTTVs emotes and Twitch's @started(21-01-06 14:41) @done(21-01-06 14:41) @lasted(40s)
     https://api.betterttv.net/3/cached/frankerfacez/users/twitch/${id}
     Need channelID in order to fetch bttv emote data
     BTTV parses messages and replaces emotes with img elements with src being cdn to emote images
-☐ Impl Twitch global emotes @started(21-01-07 19:12)
     endpoint to get emoteIds https://api.twitch.tv/kraken/chat/emoticon_images
     twitch emote cdn - https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/1.0
 ✔ Fix chat not re-rendering on undefined @done(20-12-23 00:22)
@@ -17,19 +13,23 @@
     Seems that twitch & twitter do a loop over and reverse loop of a word in a string
     to detect if user is attempting to make a user find query.
 ✔ Fix duplicate find user results in ChatBox's FindUser component @started(20-12-23 23:25) @done(20-12-24 19:29) @lasted(20h4m43s)
-☐ Input should resize itself depending on the amount of characters within it
-☐ Simplify actions in MobX, use more useEffects. @started(21-01-04 10:45)
-☐ Stabalize and lessen abstraction of search prediction feature @started(20-12-29 19:25)
-    ☐ Clean up CSS for search results
-    ☐ Lessen abstraction
-☐ Add logout button
-
-
-☐ Style messages better, BTTV emotes should be centered
-
+✔ Simplify actions in MobX, use more useEffects. @started(21-01-04 10:45) @done(21-01-13 22:51) @lasted(1w2d12h6m3s)
+✔ Stabalize and lessen abstraction of search prediction feature @started(20-12-29 19:25) @done(21-01-13 22:51) @lasted(2w1d3h26m9s)
+✔ Clean up CSS for search results @done(21-01-13 22:51)
+✔ Lessen abstraction @done(21-01-13 22:51)
+✔ Style messages better, BTTV emotes should be centered @done(21-01-13 22:50)
 ✔ Create Tabs switch mechanism @done(21-01-04 01:26)
-   from > to 
-   inc everything after toPos
-   from < to
-   dec everything in between from and to
-    ✔ Lighten backgroundcolor of hovered tabs @started(21-01-12 20:26) @done(21-01-12 21:36) @lasted(1h10m53s)
+    from > to 
+    inc everything after toPos
+    from < to
+    dec everything in between from and to
+✔ Lighten backgroundcolor of hovered tabs @started(21-01-12 20:26) @done(21-01-12 21:36) @lasted(1h10m53s)
+☐ Add button to hide follower bar
+☐ Impl twitch's irc events to channels
+☐ Impl Twitch global emotes @started(21-01-07 19:12)
+    twitch docs are so bad
+☐ Input should resize itself depending on the amount of characters within it
+☐ Add logout button
+☐ Add ability to click on individual users to display more info
+☐ Add right click to channel tab and allow more options
+    ☐ Option One: Open channel in browser

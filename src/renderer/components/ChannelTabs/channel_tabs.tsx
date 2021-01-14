@@ -6,8 +6,8 @@ import { ThemeData } from "../../stores/theme_store";
 import { AiOutlineClose } from "react-icons/ai";
 
 import "./channel_tabs.scss";
-import { action, computed, makeObservable, observable } from "mobx";
 import { Channel } from "../../stores/channel";
+import { TabState } from "../../stores/tabs_state";
 
 interface Props {
   tc: TwitchStore;
@@ -29,7 +29,7 @@ const Tab = styled.div<TabProps>`
   height: 100%;
   background-color: ${(p) => {
     if (p.isHover) {
-      return p.shadeTwo
+      return p.shadeTwo;
     }
     return p.shadeOne;
   }};
@@ -46,7 +46,6 @@ const Tab = styled.div<TabProps>`
       if (p.isError) {
         color = "red";
       }
-      console.log(color);
       return color;
     }};
 
@@ -57,47 +56,7 @@ const Tab = styled.div<TabProps>`
     margin: auto;
   }
 `;
-class TabState {
-  from: Channel | null = null;
-  to: Channel | null = null;
 
-  constructor(private tc: TwitchStore) {
-    makeObservable(this, {
-      from: observable,
-      to: observable,
-      toFrom: computed,
-      isChanging: computed,
-      reset: action,
-      finalize: action,
-    });
-  }
-  get toFrom() {
-    const from = this.from?.key || null,
-      to = this.to?.key || null;
-    return { from, to };
-  }
-  get isChanging() {
-    return this.from !== null;
-  }
-  finalize() {
-    if (!this.to || !this.from) {
-      return;
-    }
-    const to = this.to.position;
-    const from = this.from.position;
-    this.from.position = to;
-    if (to > from) {
-      this.tc.decBeforePosition({ from, to, chan: this.from });
-    } else if (to < from) {
-      this.tc.incAfterPosition(to, this.from);
-    }
-    this.reset();
-  }
-  reset() {
-    this.from = null;
-    this.to = null;
-  }
-}
 const ChannelTabs = observer(({ tc, theme, tabState }: ExtProps) => {
   const { selected, tabs } = tc;
 
@@ -119,6 +78,7 @@ const ChannelTabs = observer(({ tc, theme, tabState }: ExtProps) => {
           const isHover = tabState.to === c;
           return (
             <Tab
+              onContextMenu={(_) => console.log(_)}
               isHover={isHover}
               onDragOver={() => {
                 let to: Channel | null = null;
@@ -129,7 +89,6 @@ const ChannelTabs = observer(({ tc, theme, tabState }: ExtProps) => {
               }}
               onDragEnd={(_) => {
                 if (tabState.isChanging) {
-                  console.log("fin");
                   tabState.finalize();
                 }
               }}

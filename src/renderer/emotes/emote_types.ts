@@ -43,3 +43,10 @@ export type BaseEmote = {
   url: string;
   word: string;
 };
+
+export type GlobalBttvEmotes = {
+  code: string;
+  id: string;
+  imageType: string;
+  userId: string;
+};

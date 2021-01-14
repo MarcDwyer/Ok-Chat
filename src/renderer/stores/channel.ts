@@ -1,8 +1,15 @@
-import { action, autorun, computed, makeObservable, observable } from "mobx";
+import {
+  action,
+  autorun,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+} from "mobx";
 import { nanoid } from "nanoid";
 import { Client } from "tmi.js";
 import { TwitchApi, TwitchEndpoints } from "../../twitch_api";
-import { EmoteMap } from "../emotes/emotes";
+import { EmoteApi, EmoteMap } from "../emotes/emotes";
 import { SearchChannel, ChannelData } from "../twitch_types/twitch_api_types";
 import { Message } from "./tc_store";
 
@@ -11,7 +18,7 @@ type ChannelConfig = {
   client: Client;
   key: string;
   api: TwitchApi;
-  emotes: EmoteMap | null;
+  emotes: EmoteMap;
 };
 export class Channel {
   id: string = nanoid(5);
@@ -27,7 +34,7 @@ export class Channel {
 
   data: ChannelData | null = null;
 
-  emotes: EmoteMap | null;
+  emotes: EmoteMap;
 
   private client: Client;
 
@@ -35,12 +42,8 @@ export class Channel {
     this.client = client;
     this.position = position;
     this.key = key;
-    let emo: null | EmoteMap = emotes;
-    if (emotes) {
-      //@ts-ignore
-      emo = new Map(emotes);
-    }
-    this.emotes = emo;
+
+    this.emotes = new Map(emotes);
 
     makeObservable(this, {
       pause: observable,
@@ -66,21 +69,14 @@ export class Channel {
         }
       });
     });
-    // reaction(
-    //   () => this.data,
-    //   async (data) => {
-    //     if (data) {
-    //       EmoteApi.getFrankerEmotes(data._id).then((emotes) => {
-    //         const result = new Map<string, Emote>();
-    //         for (const emote of emotes) {
-    //           result.set(emote.code, emote);
-    //         }
-    //         console.log(result);
-    //         this.emotes = result;
-    //       });
-    //     }
-    //   }
-    // );
+    reaction(
+      () => this.data,
+      async (data) => {
+        if (data) {
+          EmoteApi.attachFrankEmotes(data._id, this.emotes);
+        }
+      }
+    );
   }
   async join() {
     try {

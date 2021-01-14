@@ -1,0 +1,11 @@
+.join-tab {
+  display: flex;
+  height: 100%;
+  border: solid 1px black;
+  flex: 0 0 45px;
+  cursor: pointer;
+
+  svg {
+    margin: auto;
+  }
+}

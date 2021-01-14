@@ -1,5 +1,5 @@
 .selected {
-  width: 95%;
+  width: 98%;
   margin: auto;
   height: 100%;
   display: flex;
@@ -19,18 +19,24 @@
     .message {
       display: flex;
       padding: 5px 5px;
+      width: 99%;
+      height: auto;
 
       .actual-msg {
         margin-left: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        height: auto;
 
-        img {
-          margin-top: auto;
-          margin-bottom: auto;
-          margin-right: 2.5px;
+        img,
+        span {
+          margin: auto 1.75px auto 1.75px;
         }
       }
 
       .author {
+        margin: 0 0 auto 0;
         font-weight: bold;
       }
     }

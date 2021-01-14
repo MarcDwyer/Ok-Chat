@@ -36,7 +36,7 @@ export class TwitchStore {
 
   selected: Channel | null = null;
 
-  emotes: null | EmoteMap = null;
+  emotes: EmoteMap = new Map();
 
   constructor() {
     makeObservable(this, {
@@ -58,12 +58,7 @@ export class TwitchStore {
       (api) => {
         if (api) {
           console.log("running...");
-          EmoteApi.getTwitchEmotes(api)
-            .then((emotes) => {
-              console.log(emotes);
-              this.emotes = emotes;
-            })
-            .catch((e) => console.error(e));
+          EmoteApi.attachBttvGlobalEmotes(this.emotes);
         }
       }
     );
