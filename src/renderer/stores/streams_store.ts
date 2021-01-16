@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import { TwitchApi, TwitchEndpoints } from "../../twitch_api";
 import {
   StreamData,
@@ -10,17 +10,27 @@ export class StreamStore {
   error: string | null = null;
 
   private refresh: NodeJS.Timeout | null = null;
-  private api: TwitchApi | null = null;
+  api: TwitchApi | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeObservable(this, {
+      followers: observable,
+      error: observable,
+      api: observable,
+      getFollowers: action,
+      init: action,
+    });
   }
   async getFollowers() {
-    const follows = await this.api?.fetch<V5StreamersPayload>(
-      TwitchEndpoints.follows
-    );
-    if (follows && follows.streams) {
-      this.followers = follows.streams;
+    try {
+      const follows = await this.api?.fetch<V5StreamersPayload>(
+        TwitchEndpoints.follows
+      );
+      if (follows && follows.streams) {
+        this.followers = follows.streams;
+      }
+    } catch (e) {
+      throw e;
     }
   }
   init(api: TwitchApi) {
@@ -31,5 +41,14 @@ export class StreamStore {
     this.refresh = setInterval(() => {
       this.getFollowers();
     }, 60000 * 5);
+  }
+  reset() {
+    if (this.refresh) clearInterval(this.refresh);
+    for (const [k, v] of Object.entries(this)) {
+      if (typeof v !== "function") {
+        //@ts-ignore
+        this[k] = null;
+      }
+    }
   }
 }

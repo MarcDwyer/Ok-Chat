@@ -1,11 +1,4 @@
-import {
-  action,
-  autorun,
-  computed,
-  makeObservable,
-  observable,
-  reaction,
-} from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { Channel } from "./channel";
 import { ChatUserstate, Client } from "tmi.js";
 import { nanoid } from "nanoid";
@@ -38,6 +31,8 @@ export class TwitchStore {
 
   emotes: EmoteMap = new Map();
 
+  private initState: this = { ...this };
+
   constructor() {
     makeObservable(this, {
       channelHub: observable,
@@ -51,13 +46,13 @@ export class TwitchStore {
       joinTabs: action,
       tabs: computed,
       connect: action,
+      reset: action,
     });
 
     reaction(
       () => this.api,
       (api) => {
         if (api) {
-          console.log("running...");
           EmoteApi.attachBttvGlobalEmotes(this.emotes);
         }
       }
@@ -70,6 +65,15 @@ export class TwitchStore {
       () => this.selected,
       (sel, prevSel) => this.handleSelected(sel, prevSel)
     );
+  }
+  reset() {
+    console.log(this.initState);
+    for (const [k, v] of Object.entries(this.initState)) {
+      if (typeof v !== "function" && k in this) {
+        //@ts-ignore
+        this[k] = v;
+      }
+    }
   }
   handleSelected(curr: Channel | null, prev: Channel | null) {
     const tabs = this.tabs;
@@ -145,7 +149,13 @@ export class TwitchStore {
     const channels: string[] = JSON.parse(ls);
     let selected: Channel | null = null;
     channels.forEach((channel, i) => {
-      if (this.channelHub.has(channel) || !this.client || !this.api) return;
+      if (
+        this.channelHub.has(channel) ||
+        !this.client ||
+        !this.api ||
+        channel === "null"
+      )
+        return;
       const c = new Channel({
         key: channel,
         client: this.client,
@@ -159,7 +169,6 @@ export class TwitchStore {
     });
     this.selected = selected;
   }
-
   connect(api: TwitchApi) {
     this.api = api;
     const client = Client({

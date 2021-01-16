@@ -7,7 +7,7 @@ import { UserInfoStore } from "../../stores/user_info_store";
 
 import Login from "../Login/login";
 import { EnterUser } from "../EnterUsername/enter_user";
-import { Followers } from "../Followed/followers";
+import { Navbar } from "../Navbar/navbar";
 import ChannelTabs from "../ChannelTabs/channel_tabs";
 import Chat from "../Chat/chat";
 
@@ -35,6 +35,9 @@ export const Main = observer(
         const api = new TwitchApi(token, username);
         streamStore.init(api);
         tc.connect(api);
+      } else if (!username && !token) {
+        streamStore.reset();
+        tc.reset();
       }
     }, [username, token]);
 
@@ -57,6 +60,7 @@ export const Main = observer(
         tc.selected = null;
       }
     }, [tc.channelHub, tc.selected]);
+    console.log(token);
     return (
       <div
         className="container"
@@ -71,7 +75,8 @@ export const Main = observer(
         )}
         {token && username && (
           <div className="main-app">
-            <Followers
+            <Navbar
+              userInfo={userInfo}
               streamStore={streamStore}
               themeStore={themeStore}
               tc={tc}

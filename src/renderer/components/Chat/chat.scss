@@ -4,7 +4,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  position: relative;
   overflow: hidden;
   .chat {
     display: flex;
@@ -15,6 +14,7 @@
     overflow-x: hidden;
     margin-bottom: 5px;
     margin-top: 5px;
+    position: relative;
 
     .message {
       display: flex;
@@ -70,4 +70,23 @@
 }
 .self {
   background-color: rgba(0, 0, 255, 0.24);
+}
+
+.pause-btn {
+  font-size: 14px;
+  height: 20px;
+  z-index: 5000;
+  background-color: #6441a5;
+  border: none;
+  outline: none;
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  cursor: pointer;
+  color: #eee;
+
+  span {
+    margin: 10px auto 10px auto;
+  }
 }

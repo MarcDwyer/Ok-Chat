@@ -14,23 +14,7 @@ type Props = {
   selected: Channel;
 };
 
-const PauseBtn = styled.button`
-  width: 90%;
-  margin: auto;
-  font-size: 14px;
-  height: 20px;
-  background-color: transparent;
-  background-color: #6441a5;
-  border: none;
-  outline: none;
-
-  cursor: pointer;
-  color: #eee;
-
-  span {
-    margin: 5px auto 5px auto;
-  }
-`;
+const PauseBtn = styled.button``;
 
 export const Chat = observer(({ selected, ss }: Props) => {
   const chatDiv = useRef<any>();
@@ -41,7 +25,8 @@ export const Chat = observer(({ selected, ss }: Props) => {
     const c = chatDiv.current as HTMLDivElement;
     if (c.scrollTop !== 0 && !selected.pause) {
       selected.initPause();
-    } else if (c.scrollTop >= -45 && selected.pause) {
+    } else if (c.scrollTop >= 0 && selected.pause) {
+      console.log("ending...");
       selected.endPause();
       c.scrollTo({ top: 0 });
     }
@@ -113,18 +98,19 @@ export const Chat = observer(({ selected, ss }: Props) => {
                   );
                 })}
                 {ss.searchMode && <FindUser results={ss.results} />}
+                {selected.pause && isCurr && (
+                  <PauseBtn
+                    className="pause-btn"
+                    onClick={() => {
+                      const c = chatDiv.current as HTMLDivElement;
+                      c.scrollTo({ top: 0 });
+                      selected.endPause();
+                    }}
+                  >
+                    <span>Click to unpause chat</span>
+                  </PauseBtn>
+                )}
               </div>
-              {selected.pause && isCurr && (
-                <PauseBtn
-                  onClick={() => {
-                    const c = chatDiv.current as HTMLDivElement;
-                    c.scrollTo({ top: 0 });
-                    selected.endPause();
-                  }}
-                >
-                  <span>Click to unpause chat</span>
-                </PauseBtn>
-              )}
               <ChatBox selected={selected} ss={ss} />
             </div>
           );

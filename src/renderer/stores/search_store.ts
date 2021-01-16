@@ -22,11 +22,9 @@ export class SearchStore {
     index: 0,
   };
 
-  private initState: SearchStore;
+  private initState: this = { ...this };
 
   constructor() {
-    this.initState = { ...this };
-
     makeObservable(this, {
       query: observable,
       msg: observable,
@@ -111,7 +109,6 @@ export class SearchStore {
     switch (key) {
       case "Tab":
       case "Enter":
-        console.log("submitting");
         const channel = users[index];
         this.completeQuery(channel);
         break;

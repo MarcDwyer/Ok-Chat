@@ -33,3 +33,7 @@
 ☐ Add ability to click on individual users to display more info
 ☐ Add right click to channel tab and allow more options
     ☐ Option One: Open channel in browser
+
+
+☐ Bugs
+    ☐ If follower fetch errors, refetch after x amount of time @started(21-01-14 15:34)

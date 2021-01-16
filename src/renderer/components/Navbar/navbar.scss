@@ -5,6 +5,17 @@
   flex: 0 0 275px;
   overflow-y: auto;
 
+  .buttons {
+    width: 100%;
+    display: flex;
+    padding: 10px 10px;
+    border-bottom: 1px solid black;
+    svg {
+      cursor: pointer;
+      font-size: 27px;
+    }
+  }
+
   .streamer-card {
     display: flex;
     padding: 5px 5px;
