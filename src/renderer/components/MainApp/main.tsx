@@ -9,11 +9,13 @@ import Login from "../Login/login";
 import { EnterUser } from "../EnterUsername/enter_user";
 import { Navbar } from "../Navbar/navbar";
 import ChannelTabs from "../ChannelTabs/channel_tabs";
-import Chat from "../Chat/chat";
+import { Chat } from "../Chat/chat";
+import { ChatBox } from "../ChatBox/chatbox";
 
 import "./main.scss";
 import { StreamStore } from "../../stores/streams_store";
 import { TwitchApi } from "../../../twitch_api";
+import { SearchStore } from "../../stores/search_store";
 
 type TokenPayload = {
   token?: string;
@@ -24,9 +26,10 @@ type Props = {
   tc: TwitchStore;
   userInfo: UserInfoStore;
   streamStore: StreamStore;
+  searchStore: SearchStore;
 };
 export const Main = observer(
-  ({ themeStore, tc, userInfo, streamStore }: Props) => {
+  ({ themeStore, tc, userInfo, streamStore, searchStore }: Props) => {
     const { themeData } = themeStore;
     const { token, username } = userInfo;
 
@@ -80,11 +83,13 @@ export const Main = observer(
               streamStore={streamStore}
               themeStore={themeStore}
               tc={tc}
+              ss={searchStore}
             />
             {tc.selected && (
               <div className="inner-app">
                 <ChannelTabs tc={tc} theme={themeData} />
                 <Chat selected={tc.selected} />
+                <ChatBox selected={tc.selected} ss={searchStore} />
               </div>
             )}
           </div>

@@ -35,6 +35,7 @@
     ☐ Option One: Open channel in browser
 
 ☐ Use navbar for search queries
+    ChatBox can be moved to the main parent component
 
 ☐ Bugs
     ✔ If follower fetch errors, refetch after x amount of time @done(21-01-16 13:51)

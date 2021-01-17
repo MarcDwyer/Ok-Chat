@@ -1,15 +1,12 @@
 import { observer } from "mobx-react-lite";
 import React, { useRef, useCallback, useEffect, useState } from "react";
-import { ChatBox } from "../ChatBox/chatbox";
 
 import "./chat.scss";
-import { SearchStore } from "../../stores/search_store";
-import { FindUser } from "./find_user";
+import { FindUser } from "../FindUsers/find_user";
 import { Channel } from "../../stores/channel";
 import { ChatMessages } from "../ChatMessages/chat_messages";
 
 type Props = {
-  ss: SearchStore;
   selected: Channel;
 };
 type BindElement = {
@@ -35,7 +32,7 @@ const useBind = (ref: React.MutableRefObject<HTMLDivElement> | undefined): UseBi
 
   return bindEle
 }
-export const Chat = observer(({ selected, ss }: Props) => {
+export const Chat = observer(({ selected }: Props) => {
   const chatDiv = useRef<any>();
 
   const bindings = useBind(chatDiv);
@@ -53,17 +50,6 @@ export const Chat = observer(({ selected, ss }: Props) => {
     }
   }, [selected]);
 
-  useEffect(() => {
-    if (ss.searchMode) {
-      ss.snapshot = [...selected.messages];
-    }
-  }, [ss.searchMode]);
-  useEffect(() => {
-    if (ss.searchMode && ss.snapshot) {
-      ss.updateResults(selected.channelName);
-    }
-  }, [selected.channelName, ss.query, ss.searchMode, ss.snapshot]);
-
 
   return (
     <>
@@ -79,7 +65,6 @@ export const Chat = observer(({ selected, ss }: Props) => {
                 )}
                 <ChatMessages messages={selected.messages} emotes={selected.emotes} />
               </div>
-              {ss.searchMode && <FindUser results={ss.results} />}
               {selected.pause && bindings && (() => {
                 const [binds, rest] = bindings; 
                   return (
@@ -99,18 +84,9 @@ export const Chat = observer(({ selected, ss }: Props) => {
                     )
                   )
               })()}
-
-              <ChatBox selected={selected} ss={ss} />
             </div>
           );
         })()}
     </>
   );
 });
-
-interface InitProps {
-  selected: Channel;
-}
-export default ({ selected }: InitProps) => (
-  <Chat selected={selected} ss={new SearchStore()} />
-);

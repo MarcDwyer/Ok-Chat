@@ -112,10 +112,10 @@ export class SearchStore {
         const channel = users[index];
         this.completeQuery(channel);
         break;
-      case "ArrowUp":
+      case "ArrowDown":
         ++next;
         break;
-      case "ArrowDown":
+      case "ArrowUp":
         --next;
     }
     if (!users[next]) {

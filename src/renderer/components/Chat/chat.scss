@@ -1,5 +1,5 @@
 .selected {
-  width: 98%;
+  width: 100%;
   margin: auto;
   height: 100%;
   display: flex;
@@ -10,7 +10,7 @@
     margin: auto;
     display: flex;
     flex-direction: column-reverse;
-    width: 95%;
+    width: 100%;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -41,29 +41,7 @@
     }
   }
 }
-.find-user {
-  position: absolute;
-  bottom: 5px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  left: 5px;
-  display: flex;
-  flex-direction: column-reverse;
-  width: 125px;
-  background-color: rgb(35, 38, 43);
-  color: #eee;
-  z-index: 5000;
-  border-radius: 5px;
-  padding: 10px 10px;
 
-  .found {
-    padding: 5px 5px;
-  }
-
-  .found-selected {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-}
 .directmsg {
   background-color: rgba(176, 9, 35, 0.74);
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Channel } from "../../stores/channel";
 import styled from "styled-components";
 
@@ -16,16 +16,17 @@ type InputProps = {
 };
 
 const MyChatBox = styled.textarea<InputProps>`
-  width: 100%;
+  width: 95%;
   background-color: ${(p) =>
     p.isChannel ? "rgba(255,255,255,.1)" : "rgba(255,255,255,.055)"};
   border: none;
   border-radius: 10px;
-  padding: 10px 10px;
   margin: auto;
   outline: none;
   color: #eee;
-  font-size: 18px;
+  height: 55px;
+  padding: 10px 10px;
+  font-size: 15px;
   resize: vertical;
 `;
 enum ArrowKeys {
@@ -36,6 +37,17 @@ enum ArrowKeys {
 }
 export const ChatBox = observer(({ selected, ss }: Props) => {
   const isChannel = Boolean(selected);
+
+  useEffect(() => {
+    if (ss.searchMode) {
+      ss.snapshot = [...selected.messages];
+    }
+  }, [ss.searchMode]);
+  useEffect(() => {
+    if (ss.searchMode && ss.snapshot) {
+      ss.updateResults(selected.channelName);
+    }
+  }, [selected.channelName, ss.query, ss.searchMode, ss.snapshot]);
   return (
     <form
       onKeyDown={(e) => {
