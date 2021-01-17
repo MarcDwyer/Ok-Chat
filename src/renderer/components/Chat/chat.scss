@@ -5,16 +5,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
   .chat {
+    margin: auto;
     display: flex;
     flex-direction: column-reverse;
-    width: 100%;
+    width: 95%;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    margin-bottom: 5px;
-    margin-top: 5px;
-    position: relative;
 
     .message {
       display: flex;
@@ -44,7 +43,7 @@
 }
 .find-user {
   position: absolute;
-  bottom: 75px;
+  bottom: 5px;
   overflow-y: auto;
   overflow-x: hidden;
   left: 5px;
@@ -74,15 +73,12 @@
 
 .pause-btn {
   font-size: 14px;
-  height: 20px;
+  height: 25px;
   z-index: 5000;
   background-color: #6441a5;
   border: none;
   outline: none;
-  position: absolute;
-  bottom: 5px;
-  left: 0;
-  right: 0;
+  position: fixed;
   cursor: pointer;
   color: #eee;
 

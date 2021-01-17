@@ -34,6 +34,8 @@
 ☐ Add right click to channel tab and allow more options
     ☐ Option One: Open channel in browser
 
+☐ Use navbar for search queries
 
 ☐ Bugs
-    ☐ If follower fetch errors, refetch after x amount of time @started(21-01-14 15:34)
+    ✔ If follower fetch errors, refetch after x amount of time @done(21-01-16 13:51)
+    ☐ Unpause chat not displaying properly @started(21-01-16 13:51)

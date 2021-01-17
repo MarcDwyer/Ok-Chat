@@ -37,7 +37,7 @@ const Tab = styled.div<TabProps>`
   cursor: pointer;
   border-left: 0.5px solid black;
   border-right: 0.5px solid black;
-  border-bottom: 0.5px solid
+  border-bottom: 2.5px solid
     ${(p) => {
       let color: string = "black";
       if (p.isSel) {

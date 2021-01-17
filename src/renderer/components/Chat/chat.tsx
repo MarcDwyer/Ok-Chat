@@ -1,29 +1,50 @@
 import { observer } from "mobx-react-lite";
-import React, { useRef, useCallback, useEffect } from "react";
+import React, { useRef, useCallback, useEffect, useState } from "react";
 import { ChatBox } from "../ChatBox/chatbox";
-import styled from "styled-components";
 
 import "./chat.scss";
-import { getMsgStyle } from "../../util";
 import { SearchStore } from "../../stores/search_store";
 import { FindUser } from "./find_user";
 import { Channel } from "../../stores/channel";
+import { ChatMessages } from "../ChatMessages/chat_messages";
 
 type Props = {
   ss: SearchStore;
   selected: Channel;
 };
+type BindElement = {
+  bottom: number;
+  left: number;
+  position: string;
+}
 
-const PauseBtn = styled.button``;
+type UseBind = [binds: BindElement, ref: DOMRect];
+const useBind = (ref: React.MutableRefObject<HTMLDivElement> | undefined): UseBind | null => {
+  const [bindEle, setBindEle] = useState<UseBind | null>(null);
+  useEffect(() => {
+    if (ref?.current) {
+      const bound = ref.current.getBoundingClientRect();
 
+      setBindEle([{
+      bottom: bound.top,
+      left: bound.left,
+      position: "fixed",
+    }, bound])
+    }
+  }, [ref, ref?.current])
+
+  return bindEle
+}
 export const Chat = observer(({ selected, ss }: Props) => {
   const chatDiv = useRef<any>();
-  const isCurr = chatDiv && chatDiv.current;
+
+  const bindings = useBind(chatDiv);
 
   const handlePause = useCallback(() => {
     if (!selected) return;
     const c = chatDiv.current as HTMLDivElement;
     if (c.scrollTop !== 0 && !selected.pause) {
+      console.log("init pause");
       selected.initPause();
     } else if (c.scrollTop >= 0 && selected.pause) {
       console.log("ending...");
@@ -43,31 +64,7 @@ export const Chat = observer(({ selected, ss }: Props) => {
     }
   }, [selected.channelName, ss.query, ss.searchMode, ss.snapshot]);
 
-  const parseMsg = (msg: string) => {
-    return (
-      <div className="actual-msg">
-        {(() => {
-          if (!selected.emotes.size) return msg;
-          const words = msg.split(" ");
-          const result: JSX.Element[] = [];
-          words.forEach((word, i) => {
-            //@ts-ignore
-            const emote = selected.emotes.get(word);
-            if (emote) {
-              result.push(<img key={i} src={emote.url} />);
-            } else {
-              result.push(
-                <span key={i} className="word">
-                  {word}{" "}
-                </span>
-              );
-            }
-          });
-          return result;
-        })()}
-      </div>
-    );
-  };
+
   return (
     <>
       {!selected && <div>Try joining a channel...</div>}
@@ -80,37 +77,29 @@ export const Chat = observer(({ selected, ss }: Props) => {
                 {isError && (
                   <span className="chan error">{selected.error}</span>
                 )}
-                {selected.messages.map((msg) => {
-                  return (
-                    <div
-                      key={msg.id}
-                      className={`message ${msg.self ? "self" : ""}`}
-                      style={getMsgStyle(msg)}
-                    >
-                      <span
-                        style={{ color: msg.userData.color }}
-                        className="author"
-                      >
-                        {msg.userData["display-name"]}:
-                      </span>
-                      {parseMsg(msg.message)}
-                    </div>
-                  );
-                })}
-                {ss.searchMode && <FindUser results={ss.results} />}
-                {selected.pause && isCurr && (
-                  <PauseBtn
-                    className="pause-btn"
-                    onClick={() => {
-                      const c = chatDiv.current as HTMLDivElement;
-                      c.scrollTo({ top: 0 });
-                      selected.endPause();
-                    }}
-                  >
-                    <span>Click to unpause chat</span>
-                  </PauseBtn>
-                )}
+                <ChatMessages messages={selected.messages} emotes={selected.emotes} />
               </div>
+              {ss.searchMode && <FindUser results={ss.results} />}
+              {selected.pause && bindings && (() => {
+                const [binds, rest] = bindings; 
+                  return (
+                    (
+                      <button
+                        //@ts-ignore
+                        style={{ ...binds, bottom: binds.bottom + 20,  width: rest.width }}
+                        className="pause-btn"
+                        onClick={() => {
+                          const c = chatDiv.current as HTMLDivElement;
+                          c.scrollTo({ top: 0 });
+                          selected.endPause();
+                        }}
+                      >
+                        <span>Click to unpause chat</span>
+                      </button>
+                    )
+                  )
+              })()}
+
               <ChatBox selected={selected} ss={ss} />
             </div>
           );

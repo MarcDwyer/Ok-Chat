@@ -67,7 +67,6 @@ export class TwitchStore {
     );
   }
   reset() {
-    console.log(this.initState);
     for (const [k, v] of Object.entries(this.initState)) {
       if (typeof v !== "function" && k in this) {
         //@ts-ignore
