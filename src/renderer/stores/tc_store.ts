@@ -45,7 +45,7 @@ export class TwitchStore {
       incAfterPosition: action,
       joinTabs: action,
       tabs: computed,
-      connect: action,
+      init: action,
       reset: action,
     });
 
@@ -168,18 +168,9 @@ export class TwitchStore {
     });
     this.selected = selected;
   }
-  connect(api: TwitchApi) {
+  init(client: Client, api: TwitchApi) {
     this.api = api;
-    const client = Client({
-      connection: {
-        reconnect: true,
-        secure: true,
-      },
-      identity: {
-        username: api.username,
-        password: `oauth:${api.token}`,
-      },
-    });
+    this.client = client
     client.connect().catch((e) => console.error(e));
     client.on("connected", () => {
       this.client = client;

@@ -16,6 +16,7 @@ import "./main.scss";
 import { StreamStore } from "../../stores/streams_store";
 import { TwitchApi } from "../../../twitch_api";
 import { SearchStore } from "../../stores/search_store";
+import { Client } from "tmi.js";
 
 type TokenPayload = {
   token?: string;
@@ -36,8 +37,20 @@ export const Main = observer(
     useEffect(() => {
       if (username && token) {
         const api = new TwitchApi(token, username);
+        const client = Client({
+          connection: {
+            reconnect: true,
+            secure: true,
+          },
+          identity: {
+            username: api.username,
+            password: `oauth:${api.token}`,
+          },
+        });
         streamStore.init(api);
-        tc.connect(api);
+        client.connect().then(_ => {
+          tc.init(client, api);
+        }).catch(e => userInfo.logout())
       } else if (!username && !token) {
         streamStore.reset();
         tc.reset();

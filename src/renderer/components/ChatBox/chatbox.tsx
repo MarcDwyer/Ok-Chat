@@ -16,7 +16,7 @@ type InputProps = {
 };
 
 const MyChatBox = styled.textarea<InputProps>`
-  width: 95%;
+  width: 90%;
   background-color: ${(p) =>
     p.isChannel ? "rgba(255,255,255,.1)" : "rgba(255,255,255,.055)"};
   border: none;
